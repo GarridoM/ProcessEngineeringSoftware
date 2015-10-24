@@ -88,13 +88,24 @@ function Board(numberBoxes)
 		this.addBox(30, new Box(new goToJail()))
 
 	}
+
 	this.startBoard()
+
+	this.moveToken = function(token)
+	{
+		this.boxes[token.position].moveToken(token)
+	}
 
 }
 
 function Box(theme)
 {
 	this.theme = theme
+
+	this.moveToken = function(token)
+	{
+		this.theme.moveToken(token);
+	}
 }
 
 
@@ -108,6 +119,11 @@ function Street(price, name, color)
 	this.price = price
 	this.name = name
 	this.color = color
+	this.type = "Street"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name);
+	}
 }
 
 function communityChest()
@@ -123,6 +139,7 @@ function Station(name)
 {
 	this.price = 200
 	this.name=name
+	this.type = "Station"
 }
 function Tax(option)
 {
@@ -131,13 +148,14 @@ function Tax(option)
 }
 function Jail(option)
 {
-	this.name = name
+	this.name = "Jail"
 	this.option = option
 }
 function othersExpenses(price, name)
 {
 	this.price = price;
 	this.name = name;
+	this.type = "Others Expenses"	
 
 }
 
@@ -155,8 +173,8 @@ function Exit()
 	this.name="Exit"
 }
 
-function iniGame()
-{
-	board = new Board(40)
-	board.configureBoard()
-}
+//function iniGame()
+//{
+//	board = new Board(40)
+//	board.configureBoard()
+//}
