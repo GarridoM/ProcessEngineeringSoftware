@@ -58,8 +58,19 @@ function Game(dice)
 	this.throwingDice = function(token)
 	{
 		token.position = token.position + dice.throwingDice() +  dice.throwingDice();
+		if(token.position>39)
+			token.position = token.position - 39;
 		token.setPosition(token.position)
 		this.board.moveToken(token)
+	}
+
+	this.throwingDiceTest = function(token, position)
+	{
+		token.position = token.position + position;
+		if(token.position>39)
+			token.position = token.position - 39;
+		token.setPosition(token.position);
+		this.board.moveToken(token);
 	}
 }
 
@@ -74,16 +85,6 @@ function Token (color)
 		this.position = position;
 	}
 
-	/*
-	this.moveToken = function(){
-		var diceOne = new Dice();
-		var diceTwo = new Dice();
-
-		diceOne = diceOne.throwingDice();
-		diceTwo = diceTwo.throwingDice();
-
-		position = diceOne + diceTwo;
-	}*/
 }
 
 function User(name, game){
@@ -104,6 +105,10 @@ function User(name, game){
 	{
 		//I write dependig of game just in case that the user doesnt have any game, ie, it isnt playing.
 		this.Game.throwingDice(this.Token)
+	}
+	this.throwingDiceTest = function(numberPosition)
+	{
+		this.Game.throwingDiceTest(this.Token, numberPosition)
 	}
 	
 }

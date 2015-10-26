@@ -90,7 +90,6 @@ function Board(numberBoxes)
 	}
 
 	this.startBoard()
-
 	this.moveToken = function(token)
 	{
 		this.boxes[token.position].moveToken(token)
@@ -101,7 +100,6 @@ function Board(numberBoxes)
 function Box(theme)
 {
 	this.theme = theme
-
 	this.moveToken = function(token)
 	{
 		this.theme.moveToken(token);
@@ -122,59 +120,98 @@ function Street(price, name, color)
 	this.type = "Street"
 	this.moveToken = function(token)
 	{
-		console.log("Esta en " + this.name);
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
 	}
 }
 
 function communityChest()
 {
 	this.name = "Community Chest"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
 }
 
 function Chance()
 {
 	this.name = "Chance"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
 }
 function Station(name)
 {
 	this.price = 200
 	this.name=name
 	this.type = "Station"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
 }
 function Tax(option)
 {
 	this.name = "Tax box"
 	this.option = option
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
+
 }
 function Jail(option)
 {
 	this.name = "Jail"
 	this.option = option
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
 }
 function othersExpenses(price, name)
 {
 	this.price = price;
 	this.name = name;
-	this.type = "Others Expenses"	
+	this.type = "Others Expenses"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}	
 
 }
 
 function freeParking()
 {
 	this.name = "free Parking"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
 }
 function goToJail()
 {
 	this.name = "Go to Jail"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		this.goJail(token);
+
+	}
+
+	this.goJail = function(token)
+	{
+		token.setPosition(10);
+		console.log("Vas a la carcel!")
+	}
 }
 
 function Exit()
 {
 	this.name="Exit"
+	this.moveToken = function(token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
 }
-
-//function iniGame()
-//{
-//	board = new Board(40)
-//	board.configureBoard()
-//}
