@@ -1,12 +1,15 @@
 describe("Monopoly", function(){
 
-	var ficha;
+	var dice;
+	var game;
+	var user;
 
 	beforeEach(function(){
 
-		ficha = new Token();
-		ficha.addTokens();
-		
+		dice = new Dice();
+		game = new Game(dice);
+		game.iniGame();
+		user1 = new User("Pepito");
 
 	});
 
@@ -14,32 +17,39 @@ describe("Monopoly", function(){
 
 
 		it("deberá de existir 6 fichas", function(){
-			expect(ficha.tokens.length).toBe(6);
+			expect(game.tokens.length).toBe(6);
 		});
 
 		it("deberá de existir una ficha roja", function(){
-			expect(ficha.tokens[0].color).toBe("red");
+			expect(game.tokens[0].color).toBe("red");
 		});
 
 		it("deberá de existir una ficha naranja", function(){
-			expect(ficha.tokens[1].color).toBe("orange");
+			expect(game.tokens[1].color).toBe("orange");
 		});
 
 		it("deberá de existir una ficha azul", function(){
-			expect(ficha.tokens[2].color).toBe("blue");
+			expect(game.tokens[2].color).toBe("blue");
 		});
 
 		it("deberá de existir una ficha verde", function(){
-			expect(ficha.tokens[3].color).toBe("green");
+			expect(game.tokens[3].color).toBe("green");
 		});
 
 		it("deberá de existir una ficha amarillo", function(){
-			expect(ficha.tokens[4].color).toBe("yellow");
+			expect(game.tokens[4].color).toBe("yellow");
 		});
 
 		it("deberá de existir una ficha rosa", function(){
-			expect(ficha.tokens[5].color).toBe("pink");
+			expect(game.tokens[5].color).toBe("pink");
 		});
+
+		it("debera moverse por el tablero", function(){
+			game.addUser(user1);
+			user1.askToken(game);
+			user1.throwingDiceTest(4);
+			expect(user1.token.position).toBe(4);
+		})
 
 	})
 

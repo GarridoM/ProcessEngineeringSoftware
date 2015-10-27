@@ -94,6 +94,10 @@ function Board(numberBoxes)
 	{
 		this.boxes[token.position].moveToken(token)
 	}
+	this.actionToDoNotRealPosition = function(token, position)
+	{
+		this.boxes[position].actionToDoNotRealPosition(token, position);
+	}
 
 }
 
@@ -103,6 +107,10 @@ function Box(theme)
 	this.moveToken = function(token)
 	{
 		this.theme.moveToken(token);
+	}
+	this.actionToDoNotRealPosition = function(token, position)
+	{
+		this.theme.actionToDoNotRealPosition(token, position);
 	}
 }
 
@@ -203,7 +211,7 @@ function goToJail()
 	this.goJail = function(token)
 	{
 		token.setPosition(10);
-		console.log("Vas a la carcel!")
+		console.log("Go to the Jail!")
 	}
 }
 
@@ -213,5 +221,14 @@ function Exit()
 	this.moveToken = function(token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		this.otherTimeHere(token);
+	}
+	this.actionToDoNotRealPosition = function(token)
+	{
+		this.otherTimeHere(token);
+	}
+	this.otherTimeHere = function(token)
+	{
+		token.setMoney(200);
 	}
 }

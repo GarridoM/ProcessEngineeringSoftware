@@ -59,7 +59,12 @@ function Game(dice)
 	{
 		token.position = token.position + dice.throwingDice() +  dice.throwingDice();
 		if(token.position>39)
+		{
 			token.position = token.position - 39;
+			//token.setMoney(200);
+			this.board.actionToDoNotRealPosition(token, 0);
+		}
+			
 		token.setPosition(token.position)
 		this.board.moveToken(token)
 	}
@@ -67,8 +72,11 @@ function Game(dice)
 	this.throwingDiceTest = function(token, position)
 	{
 		token.position = token.position + position;
-		if(token.position>39)
+		if(token.position>39){
 			token.position = token.position - 39;
+			//token.setMoney(200);
+			this.board.actionToDoNotRealPosition(token, 0);
+		}
 		token.setPosition(token.position);
 		this.board.moveToken(token);
 	}
@@ -83,6 +91,10 @@ function Token (color)
 
 	this.setPosition = function(position){
 		this.position = position;
+	}
+
+	this.setMoney = function(money){
+		this.money = this.money + money;
 	}
 
 }
