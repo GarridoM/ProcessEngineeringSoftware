@@ -1,15 +1,16 @@
-/**
-This is Game, it isnt the system, each that I want to play, ie,
-I create a game for a group of maximun 6 people.
-*/
-
-function Game(dice)
+function Game(dice, numPlayers)
 {
 	this.name = "New Game Create"
 	this.tokens = [];
 	this.players = [];
 	this.optionColor = ["red","orange", "blue", "green", "yellow", "pink"];
-	this.board = undefined
+	this.board = undefined;
+	this.turnGame = 0;
+	this.phase = undefined;
+	this.minNumPlayers = numPlayers;
+	this.winner = undefined;
+	this.winners = [];
+	this.dice = dice;
 
 	this.iniBoard = function()
 	{
@@ -23,14 +24,20 @@ function Game(dice)
 		{
 			this.tokens[i] = new Token (this.optionColor[i]);
 
-		}
-		
-	};
+		}		
+	}
+	
 	this.iniGame = function()
 	{
-		this.iniBoard();
-		this.iniTokens();
+		//this.iniBoard();
+		//this.iniTokens();
+		this.phase = new InitialPhase(this);
 	};
+
+	this.askToken = function ()
+	{
+		return this.lookForTokenFree();
+	}
 
 	this.lookForTokenFree = function()
 	{
@@ -48,25 +55,39 @@ function Game(dice)
 		console.log("ya no quedan fichas libres");
 	}
 
-
 	this.addUser = function(user)
 	{
 		//It's the same, I think It's "more" sofisticated -> this.players.push(user);
+		this.phase.addUser(user);
+
+	}
+	this.addingUser = function(user)
+	{
 		this.players[this.players.length] = user;
+		user.askToken(this)
 	}
 
 	this.throwingDice = function(token)
 	{
-		token.position = token.position + dice.throwingDice() +  dice.throwingDice();
+		var diceOne = this.dice.throwingDice();
+		var diceTwo = this.dice.throwingDice();
+		console.log("You get " + diceOne + " & " + diceTwo);
+		token.position = token.position + diceOne +  diceTwo;
 		if(token.position>39)
 		{
 			token.position = token.position - 39;
 			//token.setMoney(200);
 			this.board.actionToDoNotRealPosition(token, 0);
 		}
-			
 		token.setPosition(token.position)
-		this.board.moveToken(token)
+		this.board.moveToken(this, token)
+
+		// Para evitar que el usuario pueda lanzar dos veces si no ha conseguido
+		// dobles -> Quitarle el turno :)
+		if(diceOne != diceTwo){
+			this.players[this.turnGame].turn = false;
+		}
+		
 	}
 
 	this.throwingDiceTest = function(token, position)
@@ -78,49 +99,67 @@ function Game(dice)
 			this.board.actionToDoNotRealPosition(token, 0);
 		}
 		token.setPosition(token.position);
-		this.board.moveToken(token);
+		this.board.moveToken(this, token);
+		//Al añadir esta frase le obligamos a tener que pasar
+		this.players[this.turnGame].turn = false;
 	}
+	this.changedTurn = function()
+	{
+		this.players[this.turnGame].turn = false;
+		this.turnGame = this.turnGame + 1;
+		
+		if(this.turnGame > this.players.length-1)
+		{
+			console.log("Estoy dentro")
+			this.turnGame=0;
+			this.players[this.turnGame].turn = true;
+			for(i=0; i<this.players.length; i++)
+			{
+				if(this.players[i].Token.money > 20000)
+				{
+					this.winners[this.winners.length] = this.players[i]
+				}
+				
+			}
+
+			if(this.winners.length > 0)
+			{
+				//this.winner = _.max(this.winners, function(win){ return win.money}); //No me saca el mayor
+				this.winner = this.winners[0];
+				for(i=0; i< this.winners.length; i++)
+				{
+					if(this.winners[i].money> this.winner.money)
+						this.winner = this.winners[i];
+				}
+				this.phase = new EndPhase(this);
+			}
+				
+		}
+		else
+		{
+			this.players[this.turnGame].turn = true;
+		}
+			
+	}
+	this.startGame = function()
+	{
+		this.players[0].turn = true;
+	}
+
+	this.buy = function(token)
+	{
+		this.board.buy(token);
+	}
+
+	this.build = function(token, nameStreet)
+	{
+		this.board.build(token, nameStreet)
+	}
+
+	this.goOutJail = function(token, optionChoosen)
+	{
+		this.board.goOutJail(this, token, optionChoosen);
+	}
+	this.iniGame();
 }
 
-function Token (color)
-{
-	this.color = color;
-	this.assigned = false;
-	this.position = 0;
-	this.money = 1500;
-
-	this.setPosition = function(position){
-		this.position = position;
-	}
-
-	this.setMoney = function(money){
-		this.money = this.money + money;
-	}
-
-}
-
-function User(name, game){
-
-	this.name = name;
-	this.userName = undefined;
-	this.Password = undefined;
-	this.Token = undefined;
-	this.Game = undefined;
-
-	this.askToken = function(game)
-	{
-		this.Game = game;
-		this.Token = game.lookForTokenFree()
-	}
-
-	this.throwingDice = function()
-	{
-		//I write dependig of game just in case that the user doesnt have any game, ie, it isnt playing.
-		this.Game.throwingDice(this.Token)
-	}
-	this.throwingDiceTest = function(numberPosition)
-	{
-		this.Game.throwingDiceTest(this.Token, numberPosition)
-	}
-	
-}

@@ -70,16 +70,17 @@ function Board(numberBoxes)
 		this.addBox(22, new Box(new Chance()))
 		this.addBox(36, new Box(new Chance()))
 
-		'Income Tax'
-		this.addBox(4, new Box(new Tax("option")))
+		'Public Services'
+		this.addBox(12, new Box(new publicServices(150, "Electric Company")))
+		this.addBox(28, new Box(new publicServices(150, "Water Works")))
+		
 
 		'Jail'
-		this.addBox(10, new Box(new Jail("option")))
+		this.addBox(10, new Box(new Jail()))
 
-		'othersExpenses'
-		this.addBox(12, new Box(new othersExpenses(150, "Electric Company")))
-		this.addBox(28, new Box(new othersExpenses(150, "Water Works")))
-		this.addBox(38, new Box(new othersExpenses(75, "Luxury Tax")))
+		'Taxes'
+		this.addBox(4, new Box(new Tax(200, "Capital Tax")))
+		this.addBox(38, new Box(new Tax(75, "Luxury Tax")))
 
 		'Free parking'
 		this.addBox(20, new Box(new freeParking()))
@@ -90,13 +91,26 @@ function Board(numberBoxes)
 	}
 
 	this.startBoard()
-	this.moveToken = function(token)
+	this.moveToken = function(game, token)
 	{
-		this.boxes[token.position].moveToken(token)
+		this.boxes[token.position].moveToken(game, token)
 	}
 	this.actionToDoNotRealPosition = function(token, position)
 	{
 		this.boxes[position].actionToDoNotRealPosition(token, position);
+	}
+
+	this.buy = function (token)
+	{
+		this.boxes[token.position].buy(this, token);
+	}
+	this.build = function(token, nameStreet)
+	{
+		this.boxes[token.position].build(token, nameStreet)
+	}
+	this.goOutJail = function(game, token, optionChoosen)
+	{
+		this.boxes[token.position].goOutJail(game, token, optionChoosen)
 	}
 
 }
@@ -104,13 +118,25 @@ function Board(numberBoxes)
 function Box(theme)
 {
 	this.theme = theme
-	this.moveToken = function(token)
+	this.moveToken = function(game, token)
 	{
-		this.theme.moveToken(token);
+		this.theme.moveToken(game, token);
 	}
 	this.actionToDoNotRealPosition = function(token, position)
 	{
 		this.theme.actionToDoNotRealPosition(token, position);
+	}
+	this.buy = function (board, token)
+	{
+		this.theme.buy(board, token);
+	}
+	this.build = function(token, nameStreet)
+	{
+		this.theme.build(token, nameStreet)
+	}
+	this.goOutJail=function(token, optionChoosen)
+	{
+		this.theme.build(token, optionChoosen)
 	}
 }
 
@@ -122,103 +148,214 @@ function Normal()
 
 function Street(price, name, color)
 {
+	this.state = new Free();
+	this.proper = undefined;
 	this.price = price
 	this.name = name
 	this.color = color
 	this.type = "Street"
-	this.moveToken = function(token)
+	this.numberHouses = 0;
+	this.hotel = false;
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		this.state.moveToken(token, this)
+		if(this.proper != undefined && this.proper != token) this.payRenting(token);
+	}
+	this.buy = function(board, token)
+	{
+		this.state.buyProper(board, token, this)
+	}
+	this.payRenting = function(token)
+	{
+		this.state.payRenting(token, this)
+	}
+	this.build = function(token, nameStreet)
+	{
+		this.state.buildHouse(token, nameStreet)
 	}
 }
 
 function communityChest()
 {
-	this.name = "Community Chest"
-	this.moveToken = function(token)
+	this.name = "Community Chest";
+	this.cards = new Cards();
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		this.cards.readFollow(token);
+	}
+	this.buy = function(board, token)
+	{
+		console.log("No se puede comprar")
 	}
 }
 
 function Chance()
 {
 	this.name = "Chance"
-	this.moveToken = function(token)
+	this.cards = new Cards();
+
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		this.cards.readFollow(token);
+	}
+	this.buy = function(board, token)
+	{
+		console.log("No se puede comprar")
 	}
 }
 function Station(name)
 {
+	this.state = new FreeStation()
+	this.proper = undefined;
 	this.price = 200
 	this.name=name
 	this.type = "Station"
-	this.moveToken = function(token)
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		this.state.moveToken(token, this)
+		if(this.proper != undefined && this.proper != token) this.payRenting();
+	}
+	this.buy = function(token)
+	{
+		this.state.buyProper(token, this)
+	}
+	this.payRenting = function(token)
+	{
+		this.state.payRenting(token, this);
 	}
 }
-function Tax(option)
-{
-	this.name = "Tax box"
-	this.option = option
-	this.moveToken = function(token)
-	{
-		console.log("Esta en " + this.name + " En la posicion " + token.position);
-	}
 
-}
-function Jail(option)
-{
-	this.name = "Jail"
-	this.option = option
-	this.moveToken = function(token)
-	{
-		console.log("Esta en " + this.name + " En la posicion " + token.position);
-	}
-}
-function othersExpenses(price, name)
+function publicServices(price, name)
 {
 	this.price = price;
 	this.name = name;
-	this.type = "Others Expenses"
-	this.moveToken = function(token)
+	this.proper = undefined;
+	this.stateBuy = false;
+	this.type = "public Services"
+
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
-	}	
+		if(this.proper != undefined && this.proper != token)
+			this.payRenting(token);
+	}
+	this.buy = function(board, token)
+	{
+		if(this.stateBuy == false)
+		{
+			this.stateBuy = true;
+			this.proper = token;
+			token.publicServices[token.publicServices.length] = this;
+			token.money = token.money - this.price;
+		}
+		else
+			console.log("ya esta comprada")
+	}
+	this.payRenting = function(token)
+	{
+		token.money = token.money - 30;
+	}
+
+}
+function Jail()
+{
+	this.name = "Jail"
+	this.moveToken = function(game, token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
+	this.goOutJail = function(game, token, optionChoosen)
+	{
+		if(optionChoosen == "Pagar")
+		{
+			token.money = token.money - 100;
+			token.jail = false;
+		}
+		else if (optionChoosen == "Carta")
+		{
+			if(token.cardGoOutJail)
+				token.jail = false;
+		}
+		else if (optionChoosen == "Sacar Doble")
+		{
+			if(token.timesTriedGoOut < 4)
+			{
+				game.throwingDice(token)
+			}
+			else
+				this.goOutJail(token, "Pagar");
+		}
+
+	}
+	this.buy = function(board, token)
+	{
+		console.log("No se puede comprar")
+	}
+}
+function Tax(price, name)
+{
+	this.price = price;
+	this.name = name;
+	this.type = "Tax"
+	this.moveToken = function(game, token)
+	{
+		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		this.paying(token)
+	}
+	this.buy = function(board, token)
+	{
+		console.log("No se puede comprar")
+	}
+	this.paying = function(token)
+	{
+		token.money = token.money - this.price;
+	}
 
 }
 
 function freeParking()
 {
 	this.name = "free Parking"
-	this.moveToken = function(token)
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+	}
+	this.buy = function(board, token)
+	{
+		console.log("No se puede comprar")
 	}
 }
 function goToJail()
 {
 	this.name = "Go to Jail"
-	this.moveToken = function(token)
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
-		this.goJail(token);
+		this.goJail(game, token);
 
 	}
 
-	this.goJail = function(token)
+	this.goJail = function(game, token)
 	{
+		token.jail = true;
 		token.setPosition(10);
 		console.log("Go to the Jail!")
+		game.changedTurn();
+	}
+	this.buy = function(board, token)
+	{
+		console.log("No se puede comprar")
 	}
 }
 
 function Exit()
 {
 	this.name="Exit"
-	this.moveToken = function(token)
+	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
 		this.otherTimeHere(token);
@@ -230,5 +367,10 @@ function Exit()
 	this.otherTimeHere = function(token)
 	{
 		token.setMoney(200);
+		console.log("Tu salario a subido en 200 pelotis, ahora tienes " + token.money)
+	}
+	this.buy = function(board,token)
+	{
+		console.log("No se puede comprar")
 	}
 }

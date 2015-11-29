@@ -3,12 +3,17 @@ describe("Monopoly", function(){
 	var dice;
 	var game;
 	var user;
+	var board;
+	var numberBoxes;
 
 	beforeEach(function(){
 
 		dice = new Dice();
 		game = new Game(dice);
 		game.iniGame();
+		numberBoxes = 40;		
+		board = new Board(numberBoxes);
+		board.configureBoard();
 		user1 = new User("Pepito");
 
 	});

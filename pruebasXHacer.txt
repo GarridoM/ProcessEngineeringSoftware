@@ -1,0 +1,103 @@
+Sugerencias para los tests del Sprint #2:
+
+- ¿El juego permite añadir jugadores hasta completar el número de fichas?
+
+- ¿Los nuevos jugadores tienen ficha, la ficha de cada uno es de un color diferente y cada ficha tiene asociado un saldo de 150.000 pelotis?
+
+- Cuando asignamos una ficha a un jugador, ¿compruebo que esa ficha no se pueda volver a asignar?
+
+- El usuario con ficha, ¿puede lanzar los dos dados?
+
+- ¿El resultado del dado está entre 2 y 12?
+
+- ¿La posición de la ficha se modifica después de que el jugador lance el dado?
+
+- ¿Compruebo que la ficha se mueve en los límites del tablero sea cual sea su posición actual y sea cual sea el resultado de los dados?
+
+- ¿Compruebo si el resultado de los dados es un doble? (el jugador tiene derecho a lanzar los dados de nuevo)
+
+- ¿Comprueba si el jugador ha lanzado tres dobles seguidos? (en ese caso el jugador va a la Cárcel)
+
+
+Algunas sugerencias para el Sprint #3:
+
+- Ajuste de precios: dado que los precios de las calles e impuestos se mueven en el orden de los cientos de pelotis, el paso por la Casilla de Salida debería ser acorde (200 pelotis). Ese ajuste lo aplicamos al resto de precios (por ejemplo el saldo iniciar por jugador sería de 1500 pelotis).
+
+- Solución de diseño para Títulos de Propiedad: En GitHub he dejado el diagrama propuesto como posible solución para este asunto. La idea es que Calle u Estacion tienen un Titulo, un objeto que tiene los precios de cada estado de la calle o estación. El método iniTitulo() se encarga de calcular cada uno de los precios a partir del precio de la calle (el que utilizamos para crear cada objeto Calle o Estación).
+
+- Revisar el código: En todos los Sprints tenemos que dedicar un rato a revisar el código de modo que nos aseguremos de que se cumplen los principios del buen diseño.
+
+- Incluir fases del juego (Inicial, Jugar): En la fase Inicial, se pueden incorporar jugadores y no se permite lanzar dados ni realizar ninguna acción a los que ya están. Si la fase es Jugar, no se permite incorporar jugadores y se permite lanzar dados y realizar acciones.
+
+- Incluir la gestión de turnos
+
+- Pensar una solución para las tarjetas Suerte y Comunidad. Las tarjetas indican acciones como avanzar o retroceder la ficha, pagar alguna multa o impuesto, recibir algún premio, ir a la cárcel o recibir la tarjeta que libera de la cárcel.
+
+Sugerencias para las pruebas del Sprint #3:
+Control de fases:
+- Al lanzar el juego, se encuentra en la Fase Inicial
+- En la Fase Inicial no se pueden lanzar los dados ni realizar transacciones
+- Si un usuario invoca el método empezar() de Juego, la fase cambia a Jugar
+- En la fase Jugar no se pueden dar de alta usuarios, se puede lanzar dados y realizar transacciones
+- Comprobar que el juego pasa a la fase Final cuando sólo queda un usuario son saldo positivo o bien un usuario alcanza el máximo establecido de pelotis
+- En la fase Final solo se puede invocar reset() para volver a lanzar una partida
+- Comprobar que el juego termina
+
+
+Sobre la tirada:
+- Si el usuario lanza los dados y le sale un doble, ¿puede volver a tirar?
+- Si el usuario lanza y le salen tres dobles, entonces debe ir a la Cárcel
+- Comprobar el caso especial en el que el jugador que saque tres dobles seguidos, va a la Cárcel
+
+Control de turnos:
+- Al pasar de la fase Inicial a Jugar, se asigna el turno a un jugador (por ejemplo, el primero que llegó)
+- El turno cambia al siguiente jugador cuando el jugador que tiene el turno lanza los dados y no obtiene un doble
+- El usuario es obligado a lanzar los dados primero, después puede realizar las transacciones (compras, ventas, etc) e indica que ha terminado llamando al método pasarTurno()
+
+Pasar por la casilla de Salida:
+- Comprobar que el usuario recibe 200 pelotis si pasa por la casilla de salida
+
+Estaciones:
+- Comprobar que las estaciones se pueden comprar
+- Comprobar que si un usuario compra dos estaciones, sube el alquiler según el título
+- Comprobar que si un usuario compra tres estaciones, sube el alquiler según el título
+- Comprobar que si un usuario compra cuatro estaciones, sube el alquiler según el título
+
+Calles:
+- Comprobar que un usuario puede comprar una calle y su saldo se decrementa según el precio de la calle
+- Comprobar que todas las calles se pueden comprar (comprobar los saldos)
+
+- Comprobar que una calle comprada no se puede volver a comprar
+- Comprobar que si un usuario compra todas las calles (saldo teórico suficiente), la lista de propiedades es igual a 22
+- Comprobar que un usuario que cae en una calle con propietario, paga el alquiler que toque
+- Comprobar que un usuario compra todas las calles, el otro cae en todas las calles y paga lo que corresponda en cada calle
+
+Construir:
+- Comprobación de edificación: solo se puede edificar si el usuario tiene todas las calles de un grupo, se edifica en orden (no se pueden poner 2 casas en una calle y 0 en otra del mismo grupo)
+- Poner hoteles: solo se puede poner un hotel en una calle que tiene 4 casas
+
+Hipotecar:
+- El usuario puede hipotecar una calle que sea de su propiedad
+- El usuario puede levantar la hipoteca de una propiedad
+- No permitir transacciones si el usuario no tiene saldo
+
+Tarjetas Comunidad y Suerte:
+- El usuario que cae en una de esas casillas realiza alguna de estas acciones: multa, premio, avanzar(casillas), retroceder(casillas), ir a la Cárcel, quedas libre de la Cárcel
+
+- El juego permite jugar a dos jugadores o más (límite 6)
+
+- El juego controla fases: en la de Inicio, sólo se permite admitir nuevos jugadores. En la fase Jugar sólo se permite lanzar dados y transacciones (no se permite incorporar jugadores). Se llega a la fase Final cuando sólo queda un jugador con saldo o bien un jugador alcanza un máximo en su saldo (a definir)
+
+- El juego controla turnos entre los jugadores. Tiene en cuenta si un jugador saca dobles (vuelve a tirar). Si saca tres dobles seguidos va a la Cárcel. Durante el turno, el jugador primero debe lanzar los dados y después puede realizar transacciones (comprar, edificar,...). Cuando termine debe invocar el método pasarTurno() con el que se pasa el turno al siguiente jugador.
+
+- El juego controla temas: Cárcel e Ir a la Cárcel, pasar por la casilla de Salida, Caja Comunidad, Caja Suerte, calles, estaciones e impuestos y servicios
+
+- Cómo salir de la Cárcel: a) Pagar 50 pelotis; b) Usar la tarjeta Quedas Libre de la Cárcel; c) Sacar dobles en el turno del jugador. Si al tercer turno el jugador no saca dobles, debe pagar 50 pelotis y está obligado a salir.
+
+- El juego permite a los usuarios comprar calles y estaciones
+
+- El juego controla el pago de alquileres a los propietarios de calles y estaciones. El pago varía en función del estado de la calle (alquiler, con 1 casa,...) y algo parecido ocurre con las estaciones.
+
+- El juego permite edificar (casas y hoteles) al usuario propietario (durante su turno) de un conjunto de calles relacionadas (mismo color, cuando tiene un monopolio). Se construye de manera uniforme: No se puede construir una segunda casa en una calle hasta tener una casa en cada calle del grupo. El hotel se puede poner cuando tienes 4 casas en una calle.
+
+- El número de casas está limitado a 32. El número de hoteles disponible en el juego es de 12.
