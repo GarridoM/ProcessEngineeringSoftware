@@ -3,12 +3,20 @@ function Free()
 	this.moveToken = function(token, property)
 	{
 		console.log("Esta Libre");
+		token.info = token.info + "<p> It is Free"
 	}
 	this.buyProper = function(board, token, property)
-	{
-		console.log("Estas comprando")
+	{	
+		property.proper = token;
+		token.properties[token.properties.length] = property;
+		token.money = token.money - property.price;	
+		console.log("Has comprado!! Ahora tienes un saldo de " + token.money);
+		token.info = "You have bought!! Now, you have " + token.money;
 		property.state = new Rent();
-		property.state.buyProper(board, token, property);
+		property.state.checkGroup(board, token, property);
+		
+		//property.state.buyProper(board, token, property);
+		return true;
 	}
 }
 
@@ -19,22 +27,28 @@ function Rent()
 	this.moveToken = function(token, property)
 	{
 		console.log("Ya esta comprada");
+		token.info = property.name + " It is not Free";
 	}
 
 	this.buyProper = function(board, token, property)
 	{
-		console.log("Gestionando compra...")
+		/*console.log("Gestionando compra...")
 		property.proper = token;
 		token.properties[token.properties.length] = property;
 		token.money = token.money - property.price;	
 		console.log("Has comprado!! Ahora tienes un saldo de " + token.money);
-		this.checkGroup(board, token, property);
+		token.info = "You have bought!! Now, you have " + token.money;
+		this.checkGroup(board, token, property);*/
+		token.info = "You cannot buy this proper"
+		return false;
 	}
 	this.payRenting = function(token, property)
 	{
 		console.log("Cobrando alquiler")
+		token.info = "Cobrando alquiler"
 		token.money = token.money - (property.price * 0.25 + property.numberHouses * (property.price * 0.25));
 		console.log("Has pagado el alquiler, ahora tu saldo es " + token.money)
+		token.info = token.info + " You have pay the rent, now you have " + token.money;
 	}
 
 	this.checkGroup = function(board, token, property)
@@ -73,33 +87,40 @@ function Group()
 	this.moveToken = function(token, property)
 	{
 		console.log("Ya esta comprada");
+		token.info = "Ya esta comprada";
 	}
 
-	this.buildHouse = function (token, nameStreet)
+	this.buildHouse = function (token, colorGroup)
 	{
 		var foundColor;
 		var groupColor = [];
 		var buildAble = false;
 
-		if(property.numberHouses == 4 && property.hotel == false)
+		if(property.numberHouses == 4) //&& property.hotel == false)
 		{
-			this.buildHotel(token, nameStreet);
+			if(property.hotel == false)
+				this.buildHotel(token, colorGroup);
+			else
+			{
+				token.info = "You have all kind of buildings"
+				return false;
+			}
 		}
 		else
 		{
 
-			for(i=0; i< token.properties.length; i++)
+			/*for(i=0; i< token.properties.length; i++)
 			{
-				if(token.properties[i].name == nameStreet)
+				if(token.properties[i].color == colorGroup)
 				{
 					foundColor=token.properties[i].color;
 					break;
 				}
-			}
+			}*/
 
 			for(i=0; i<token.properties.length; i++)
 			{
-				if(token.properties[i].color == foundColor)
+				if(token.properties[i].color == colorGroup)
 					groupColor[groupColor.length] = token.properties[i];
 			}
 
@@ -113,7 +134,15 @@ function Group()
 			{
 				property.numberHouses = property.numberHouses + 1;
 				token.money = token.money - 150;
+				token.info = "Congratulations! You build another house"
+				return true;
 			}
+			else
+			{
+				token.info = "You cannot build"
+				return false;
+			}
+				
 		}
 
 			
@@ -122,6 +151,7 @@ function Group()
 	this.buildHotel = function(token, nameStreet)
 	{
 		console.log("Construyendo hotel porque ya tienes las 4 casas en esa calle")
+		//token.info = "Construyendo hotel porque ya tienes las 4 casas en esa calle";
 		for(i=0; i< token.properties.length; i++)
 		{
 			if(token.properties[i].name == nameStreet)
@@ -132,13 +162,16 @@ function Group()
 		}	
 		property.hotel = true;
 		token.money = token.money - 150;
+		token.info = "Congratulations!! You build a hotel!"
 	}
 
 	this.payRenting = function(token, property)
 	{
 		console.log("Cobrando alquiler")
+		token.info = "Cobrando alquiler"
 		token.money = token.money - 300;
 		console.log("Has pagado el alquiler, ahora tu saldo es " + token.money)
+		token.info = token.info + " Has pagado el alquiler, ahora tu saldo es " + token.money
 	}
 }
 

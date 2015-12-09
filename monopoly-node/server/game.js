@@ -6,6 +6,7 @@ var _=require("underscore");
 function Game(dice, numPlayers)
 {
 	this.name = "New Game Create"
+	this.uidGame = undefined;
 	this.tokens = [];
 	this.players = [];
 	this.optionColor = ["red","orange", "blue", "green", "yellow", "pink"];
@@ -16,6 +17,9 @@ function Game(dice, numPlayers)
 	this.winner = undefined;
 	this.winners = [];
 	this.dice = dice;
+	this.info = undefined;
+	this.diceOne = 0;
+	this.diceTwo = 0;
 
 	this.iniBoard = function()
 	{
@@ -39,9 +43,11 @@ function Game(dice, numPlayers)
 		if(this.minNumPlayers>6)
 		{
 			console.log("No se pueden hacer partidas de mas de 6 jugadores")
+			this.info = "No se pueden hacer partidas de mas de 6 jugadores";
 			this.minNumPlayers = 6;
 		}
 		this.phase = new mphases.InitialPhase(this);
+		this.uidGame = this.getGameUid();
 	};
 
 	this.askToken = function ()
@@ -63,6 +69,13 @@ function Game(dice, numPlayers)
 		}
 
 		console.log("ya no quedan fichas libres");
+		this.info = "ya no quedan fichas libres"
+	}
+
+	this.getGameUid = function(){
+		val = (new Date()).valueOf().toString();
+		console.log(val);
+		return val;
 	}
 
 	this.getUid = function(){
@@ -74,23 +87,24 @@ function Game(dice, numPlayers)
 	this.addUser = function(user)
 	{
 		//It's the same, I think It's "more" sofisticated -> this.players.push(user);
-		this.phase.addUser(user);
+		if(this.phase.addUser(user))
+		{
+			user.uid = this.getUid();
+			console.log("Añadido con el " + user.uid)
+			this.players[this.players.length] = user;
+			user.askToken(this)
+			this.phase.checkChangedPhase();
+		}
 
-	}
-	this.addingUser = function(user)
-	{
-		user.uid = this.getUid();
-		console.log("Añadido con el " + user.uid)
-		this.players[this.players.length] = user;
-		user.askToken(this)
 	}
 
 	this.throwingDice = function(token)
 	{
-		var diceOne = this.dice.throwingDice();
-		var diceTwo = this.dice.throwingDice();
-		console.log("You get " + diceOne + " & " + diceTwo);
-		token.position = token.position + diceOne +  diceTwo;
+		this.diceOne = this.dice.throwingDice();
+		this.diceTwo = this.dice.throwingDice();
+		console.log("You get " + this.diceOne + " & " + this.diceTwo);
+		this.info = "You get " + this.diceOne + " & " + this.diceTwo;
+		token.position = token.position + this.diceOne +  this.diceTwo;
 		if(token.position>39)
 		{
 			token.position = token.position - 39;
@@ -100,9 +114,12 @@ function Game(dice, numPlayers)
 		token.setPosition(token.position)
 		this.board.moveToken(this, token)
 
+		if(this.diceOne == this.diceTwo){
+			this.info = this.info + "You get double, so you can throw again."
+		}
 		// Para evitar que el usuario pueda lanzar dos veces si no ha conseguido
 		// dobles -> Quitarle el turno :)
-		if(diceOne != diceTwo){
+		if(this.diceOne != this.diceTwo){			
 			this.players[this.turnGame].turn = false;
 		}
 		
@@ -110,6 +127,7 @@ function Game(dice, numPlayers)
 
 	this.throwingDiceTest = function(token, position)
 	{
+		console.log("POSITIONNNNN: " + position)		
 		token.position = token.position + position;
 		if(token.position>39){
 			token.position = token.position - 39;
@@ -128,7 +146,6 @@ function Game(dice, numPlayers)
 		
 		if(this.turnGame > this.players.length-1)
 		{
-			console.log("Estoy dentro")
 			this.turnGame=0;
 			this.players[this.turnGame].turn = true;
 			for(i=0; i<this.players.length; i++)
@@ -161,17 +178,18 @@ function Game(dice, numPlayers)
 	}
 	this.startGame = function()
 	{
+		console.log("Estoy dentro2")
 		this.players[0].turn = true;
 	}
 
 	this.buy = function(token)
 	{
-		this.board.buy(token);
+		return this.board.buy(token);
 	}
 
-	this.build = function(token, nameStreet)
+	this.build = function(token, colorGroup)
 	{
-		this.board.build(token, nameStreet)
+		this.board.build(token, colorGroup)
 	}
 
 	this.goOutJail = function(token, optionChoosen)

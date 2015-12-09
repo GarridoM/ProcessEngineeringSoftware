@@ -93,10 +93,10 @@ function Board(numberBoxes)
 		this.addBox(30, new Box(new goToJail()))
 
 	}
-
-	this.startBoard()
+	
 	this.moveToken = function(game, token)
 	{
+		console.log(token.position)
 		this.boxes[token.position].moveToken(game, token)
 	}
 	this.actionToDoNotRealPosition = function(token, position)
@@ -106,17 +106,17 @@ function Board(numberBoxes)
 
 	this.buy = function (token)
 	{
-		this.boxes[token.position].buy(this, token);
+		return this.boxes[token.position].buy(this, token);
 	}
-	this.build = function(token, nameStreet)
+	this.build = function(token, colorGroup)
 	{
-		this.boxes[token.position].build(token, nameStreet)
+		this.boxes[token.position].build(token, colorGroup)
 	}
 	this.goOutJail = function(game, token, optionChoosen)
 	{
 		this.boxes[token.position].goOutJail(game, token, optionChoosen)
 	}
-
+	this.startBoard();
 }
 
 function Box(theme)
@@ -132,11 +132,11 @@ function Box(theme)
 	}
 	this.buy = function (board, token)
 	{
-		this.theme.buy(board, token);
+		return this.theme.buy(board, token);
 	}
-	this.build = function(token, nameStreet)
+	this.build = function(token, colorGroup)
 	{
-		this.theme.build(token, nameStreet)
+		this.theme.build(token, colorGroup)
 	}
 	this.goOutJail=function(token, optionChoosen)
 	{
@@ -163,20 +163,21 @@ function Street(price, name, color)
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 		this.state.moveToken(token, this)
 		if(this.proper != undefined && this.proper != token) this.payRenting(token);
 	}
 	this.buy = function(board, token)
 	{
-		this.state.buyProper(board, token, this)
+		return this.state.buyProper(board, token, this)
 	}
 	this.payRenting = function(token)
 	{
 		this.state.payRenting(token, this)
 	}
-	this.build = function(token, nameStreet)
+	this.build = function(token, colorGroup)
 	{
-		this.state.buildHouse(token, nameStreet)
+		this.state.buildHouse(token, colorGroup)
 	}
 }
 
@@ -187,11 +188,13 @@ function communityChest()
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position " + token.position;
 		this.cards.readFollow(token);
 	}
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
+		token.info = "No se puede comprar";
 	}
 }
 
@@ -203,11 +206,13 @@ function Chance()
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 		this.cards.readFollow(token);
 	}
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
+		token.info = "No se puede comprar";
 	}
 }
 function Station(name)
@@ -220,12 +225,13 @@ function Station(name)
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 		this.state.moveToken(token, this)
 		if(this.proper != undefined && this.proper != token) this.payRenting();
 	}
 	this.buy = function(token)
 	{
-		this.state.buyProper(token, this)
+		return this.state.buyProper(token, this)
 	}
 	this.payRenting = function(token)
 	{
@@ -244,6 +250,7 @@ function publicServices(price, name)
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 		if(this.proper != undefined && this.proper != token)
 			this.payRenting(token);
 	}
@@ -255,9 +262,16 @@ function publicServices(price, name)
 			this.proper = token;
 			token.publicServices[token.publicServices.length] = this;
 			token.money = token.money - this.price;
+			token.info = "You have bought!! Now, you have " + token.money;
+			return true;
 		}
 		else
-			console.log("ya esta comprada")
+		{
+			console.log("Ya esta comprada")
+			token.info = "Ya esta comprada";
+			return false;
+		}
+			
 	}
 	this.payRenting = function(token)
 	{
@@ -271,6 +285,7 @@ function Jail()
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 	}
 	this.goOutJail = function(game, token, optionChoosen)
 	{
@@ -298,6 +313,7 @@ function Jail()
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
+		token.info = "No se puede comprar"
 	}
 }
 function Tax(price, name)
@@ -308,11 +324,13 @@ function Tax(price, name)
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 		this.paying(token)
 	}
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
+		token.info = "No se puede comprar";
 	}
 	this.paying = function(token)
 	{
@@ -327,10 +345,12 @@ function freeParking()
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 	}
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
+		token.info = "No se puede comprar";
 	}
 }
 function goToJail()
@@ -339,8 +359,8 @@ function goToJail()
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 		this.goJail(game, token);
-
 	}
 
 	this.goJail = function(game, token)
@@ -348,11 +368,13 @@ function goToJail()
 		token.jail = true;
 		token.setPosition(10);
 		console.log("Go to the Jail!")
+		token.info = "Go to the Jail!"
 		game.changedTurn();
 	}
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
+		token.info = "No se puede comprar"
 	}
 }
 
@@ -362,6 +384,7 @@ function Exit()
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
+		token.info = "You are in " + this.name + " in the position: " + token.position;
 		this.otherTimeHere(token);
 	}
 	this.actionToDoNotRealPosition = function(token)
@@ -372,10 +395,12 @@ function Exit()
 	{
 		token.setMoney(200);
 		console.log("Tu salario a subido en 200 pelotis, ahora tienes " + token.money)
+		token.info = "Tu salario a subido en 200 pelotis, ahora tienes " + token.money;
 	}
 	this.buy = function(board,token)
 	{
 		console.log("No se puede comprar")
+		token.info = ("No se puede comprar")
 	}
 }
 

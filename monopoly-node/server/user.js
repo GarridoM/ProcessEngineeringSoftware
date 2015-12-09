@@ -24,11 +24,16 @@ function User(name, game){
 			 	{
 			 		console.log("Estas en la carcel")
 			 		//this.goOutingJail();
+			 		this.Token.info = "Estas en la carcel"
 			 	}
 			 	else
 					this.Game.throwingDice(this.Token)
 			else 
+			{
 				console.log("No es tu turno")
+				this.Token.info = "No es tu turno"
+			}
+				
 		}
 	}
 
@@ -41,11 +46,16 @@ function User(name, game){
 			 	{
 			 		console.log("Estas en la carcel")
 			 		//this.goOutingJail();
+			 		this.Token.info = "Estas en la carcel"
 			 	}
 			 	else
 					this.Game.throwingDiceTest(this.Token, numberPosition)
 			else 
+			{
 				console.log("No es tu turno")
+				this.Token.info = "No es tu turno"
+			}
+				
 		}
 	}
 	
@@ -63,11 +73,11 @@ function User(name, game){
 
 	this.buy = function()
 	{
-		this.Game.buy(this.Token);
+		return this.Game.buy(this.Token);
 	}
-	this.build = function(nameStreet)
+	this.build = function(colorGroup)
 	{
-		this.Game.build(this.Token, nameStreet);
+		this.Game.build(this.Token, colorGroup);
 	}
 	this.goOutJail = function(optionChoosen)
 	{
