@@ -1,0 +1,34 @@
+TABLA DE VALORACION
+
+1. Modelo probado (pruebas de Jasmine : mas de 300 assertions) y funcionando (comprar, edificar, hipotecar, tarjetas Comunidad y Suerte, vender calles, vender casas,
+fin del juego, Carcel)
+2. Servidor REST y modelo probado (al menos 15 assertions de JMeter) y funcionando (comprar, edificar, hipotecar, tarjetas Comunidad y suerte, vender calles, vender casas,
+fin del juego, Carcel, salir)
+
+
+Aprobado:
+3. Cliente sin GUI ni sockets y servidor REST
+4. Cliente con GUI con sockets y servidor REST
+
+Notable:
+
+5. Cliente GUI con sockets y servidor REST
+6. Cliente GUI con sockets y servidor REST y despliegue real (heroku, appfog o azure)
+7. Cliente GUI con sockets y servidor REST y pruebas con usuarios (no se incluye el desarrollador)
+
+
+Sobresaliente:
+8. Lo anterior + vender propiedades (a todos)
+9. Lo anterior + vender propiedades entre dos usuarios
+
+
+Addons:
+- Documentacion (Entregable obligatorio)
+- Securizar el API
+- Nuevas tarjetas
+- Gestion de partidas
+- GUI avanzada
+
+Errores:
+- Leve: pequeños errores de interacción 
+- Grabe: error 500 (inadmisibles)
