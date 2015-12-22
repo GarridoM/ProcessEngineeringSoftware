@@ -4,6 +4,7 @@ var url = "http://127.0.0.1:1337/";
 function start()
 {
 	showButtonAskToken();
+
 }
 
 function saveCookies(gamerUser)
@@ -35,12 +36,29 @@ function showButtonAskToken()
 	})
 }
 
+function showBoardGame()
+{
+	var canvas=document.getElementById("boardGraphics");
+	var context=canvas.getContext("2d");
+	var imageObj = new Image();
+
+	//maxX = canvas.width;
+	//maxY = canvas.height;
+
+	imageObj.onload=function(){
+		context.drawImage(imageObj,0,0);
+	}
+
+	imageObj.src="client/img/board.png";
+}
+
 function showInfoUser(name, uid, color, money, position){
 	showName(name);
 	showUid(uid);
 	showColorToken(color);
 	showMoneyToken(money);
 	showPositionToken(position);
+	showBoardGame();
 }
 
 function showName(name)
