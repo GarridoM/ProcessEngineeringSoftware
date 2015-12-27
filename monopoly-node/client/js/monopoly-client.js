@@ -4,7 +4,6 @@ var url = "http://127.0.0.1:1337/";
 function start()
 {
 	showButtonAskToken();
-
 }
 
 function saveCookies(gamerUser)
@@ -30,7 +29,7 @@ function showLabelsProperties()
 
 function showButtonAskToken()
 {
-	$("#buttons").append("<p id='askArea'>Name: <input type ='text' id='name'/><button id='askTokenButton'> Ask Token </button></p>");
+	$("#buttonsAsk").append("<p id='askArea' style = 'text-align: center'> <label style= 'margin-right: 5px'> Nick: </label><input type ='text' id='name' placeholder='Nick'/><button class='btn btn-primary active' style='margin-left: 5px' id='askTokenButton'> Ask Token </button></p>");
 	$('#askTokenButton').on("click", function(){
 		getToken($("#name").val());
 	})
@@ -38,18 +37,11 @@ function showButtonAskToken()
 
 function showBoardGame()
 {
-	var canvas=document.getElementById("boardGraphics");
-	var context=canvas.getContext("2d");
-	var imageObj = new Image();
-
+	var element=document.getElementById("boardGraphics");
+	element.src = "client/img/board.png";
+	element.alt = "Monopoly Board";
 	//maxX = canvas.width;
 	//maxY = canvas.height;
-
-	imageObj.onload=function(){
-		context.drawImage(imageObj,0,0);
-	}
-
-	imageObj.src="client/img/board.png";
 }
 
 function showInfoUser(name, uid, color, money, position){
@@ -196,6 +188,13 @@ function showControlsGame()
 	//showBuildButton();
 }
 
+function showTitlePage()
+{
+	var element = document.getElementById("titlePageMonopoly")
+	element.innerHTML = "Monopoly";
+
+}
+
 //Functions to connect with the server
 function getToken(name){
 	$.getJSON(url+"newUser/"+name, function(data){
@@ -210,7 +209,8 @@ function getToken(name){
 		}
 		
 		showLabelInfo();
-		showLabelsProperties();	
+		showLabelsProperties();
+		showTitlePage();
 		showInfoGame(data.infoToken);
 		showInfoGame(data.infoGame);
 

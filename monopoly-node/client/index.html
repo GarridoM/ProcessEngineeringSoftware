@@ -3,20 +3,39 @@
 
 	<script src = "client/lib/jquery-min.js"></script>
 	<script src = "client/lib/jquery-cookie.js"></script>
-	<link rel="stylesheet"  href="client/css/style.css">
+	<!--<link rel="stylesheet"  href="client/css/style.css">-->
+	 <link href="client/css/bootstrap.min.css" rel="stylesheet">
 	<title>Monopoly</title>
 
 </head>
+<nav>
+	<div id="nav"></div>
+
+</nav>
 <body>
-	<h1>Bienvenido al Monopoly</h1>
+	<div class="page-header" style = "text-align: center">
+	<h1 id="titlePageMonopoly">Welcome to Monopoly</h1></div>
+	<div id = "leftSide" class= "col-md-3 col-xs-6 col-sm-4" style="">
 	<div id = "results"></div>
 	<div id = "infoGame"></div>
 	<div id = "buttons"></div>
+	</div>
+	<div id = "middleSide" class="col-md-6 col-xs-6 col-sm-4">
+	<img id = "boardGraphics" src= "" class="img-responsive" alt="">
+	<div id = "buttonsAsk"></div>
+	</div>
+
+	<div class="clearfix visible-xs-block"></div>
+	<div id = "rightSide" class= "col-md-3 col-xs-6 col-sm-4" style="">
 	<div id = "propertiesStreets"></div>
 	<div id = "propertiesStations"></div>
-	<div id = "propertiesPublicServices"></div>
-	<canvas height="720" width="720" id = "boardGraphics"></canvas>
+	<div id = "propertiesPublicServices"></div></div>
+	<!--<canvas height="720" width="720" id = "boardGraphics"></canvas></img>-->
 	<script src = "client/js/monopoly-client.js"></script>
 	<script>start()</script>
 </body>
+<footer>
+	<div id="footer"></div>
+
+</footer>
 </html>
