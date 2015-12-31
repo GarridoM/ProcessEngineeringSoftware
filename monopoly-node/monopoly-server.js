@@ -1,16 +1,9 @@
 var fs=require("fs");
 var express=require("./node_modules/express");
 
-//var board=require("./server/board.js");
 var diceModel=require("./server/dice.js");
-//var phases=require("./server/phases.js");
-//var statesStations=require("./server/statesStations.js");
-//var statesStreet=require("./server/statesStreets.js");
-//var token=require("./server/token.js");
 var userModel=require("./server/user.js");
-//var cards=require("./server/cards.js");
 var gameModel=require("./server/game.js");
-
 var http=require("http");
 
 var config=JSON.parse(fs.readFileSync("./config.json"));
@@ -22,13 +15,76 @@ var port=config.port;
 
 var app=express();
 var server=http.createServer(app);
+var io = require('socket.io')(server);
 
 //Iniciar juego como yo lo inicie.
 var dice = new diceModel.Dice();
-var game=new gameModel.Game(dice, 2);
+var game = new gameModel.Game(dice, 2);
 
-
+server.listen(port,host);
+console.log("Servidor iniciado en puerto: "+port);
 app.use("/",express.static(__dirname));
+
+
+io.on('connection', function (socket) {
+	
+	socket.on('gameToPlay', function(){
+		
+		socket.emit('gameToPlay', {
+			namePhase: game.phase.name, 
+			infoGame: game.info
+		})
+		socket.broadcast.emit('gameToPlay', {
+			namePhase: game.phase.name, 
+			infoGame: game.info
+		})
+	})
+
+	socket.on('isMyTurn', function (uid){
+		
+		var u = game.getUser(uid);
+
+		socket.emit('checkIsMyTurn', {
+			turn:u.turn, 
+			name:u.name,
+			uid: u.uid,
+			infoGame:game.info, 
+			infoToken:u.Token.info
+		})
+		
+		socket.broadcast.emit('checkIsMyTurn', {
+			turn:u.turn, 
+			name:u.name, 
+			infoGame:game.info, 
+			infoToken:u.Token.info
+		})
+		
+	})
+
+
+	socket.on('changeMyTurn', function (uid){
+
+		var u = game.getUser(uid)
+		u.passTurn();
+		if(!u.turn)
+		{
+			socket.broadcast.emit('changeMyTurn', {
+				isChanged:true, 
+				infoGame:game.info, 
+				infoToken:u.Token.info
+			})
+		}
+		else
+		{
+			socket.broadcast.emit('changeMyTurn', {
+				isChanged:false
+			})
+		}
+
+	})
+
+});
+
 
 
 app.get("/",function(request,response){
@@ -51,20 +107,20 @@ app.get("/newUser/:name",function(request,response){
 	response.send(jsonData);
 });
 
-app.get("/gameToPlay", function(request, response)
+/*app.get("/gameToPlay", function(request, response)
 {
 	var jsonData;
 	jsonData = {"namePhase":game.phase.name, "infoGame":game.info}
 	response.send(jsonData);
-})
+})*/
 
-app.get("/isMyTurn/:uid", function(request, response)
+/*app.get("/isMyTurn/:uid", function(request, response)
 {
 	var jsonData;
 	var u = game.getUser(request.params.uid)
 	jsonData={"turn":u.turn, "name":u.name, "infoGame":game.info, "infoToken":u.Token.info}	
 	response.send(jsonData);
-})
+})*/
 
 app.get("/throwingDice/:uid", function(request, response)
 {	
@@ -134,7 +190,7 @@ app.get("/build/:uid/:nameStreet", function(request, response)
 	response.send(jsonData);
 })
 
-app.get("/changeMyTurn/:uid", function(request, response)
+/*app.get("/changeMyTurn/:uid", function(request, response)
 {
 	var jsonData;
 	var u = game.getUser(request.params.uid)
@@ -142,7 +198,5 @@ app.get("/changeMyTurn/:uid", function(request, response)
 	if(!u.turn)
 		jsonData={"isChanged":true, "infoGame":game.info, "infoToken":u.Token.info}
 	response.send(jsonData);
-})
+})*/
 
-server.listen(port,host);
-console.log("Servidor iniciado en puerto: "+port);

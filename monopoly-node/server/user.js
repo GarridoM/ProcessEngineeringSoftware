@@ -24,14 +24,14 @@ function User(name, game){
 			 	{
 			 		console.log("Estas en la carcel")
 			 		//this.goOutingJail();
-			 		this.Token.info = "Estas en la carcel"
+			 		this.Token.info = "You are in the JAIL"
 			 	}
 			 	else
 					this.Game.throwingDice(this.Token)
 			else 
 			{
 				console.log("No es tu turno")
-				this.Token.info = "No es tu turno"
+				this.Token.info = "It is NOT your turn"
 			}
 				
 		}

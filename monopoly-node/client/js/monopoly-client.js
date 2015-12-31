@@ -1,5 +1,5 @@
 var url = "http://127.0.0.1:1337/";
-
+var socket = io();
 
 function start()
 {
@@ -40,8 +40,8 @@ function showBoardGame()
 	var element=document.getElementById("boardGraphics");
 	element.src = "client/img/board.png";
 	element.alt = "Monopoly Board";
-	//maxX = canvas.width;
-	//maxY = canvas.height;
+	maxX = element.width;
+	maxY = element.height;
 }
 
 function showInfoUser(name, uid, color, money, position){
@@ -56,7 +56,7 @@ function showInfoUser(name, uid, color, money, position){
 function showName(name)
 {
 	$("#name").remove();
-	$("#results").append("<p id='name'>Name: " + name + "</p>")
+	$("#results").append("<p id='name'>Nick: " + name + "</p>")
 }
 
 function showUid(uid)
@@ -117,26 +117,29 @@ function showPropertiesWithBuilding(propertyName, numberOfHouses)
 }
 function showStarGameButton()
 {
-	$("#buttons").append("<button id='askStarGameButton'> Start Game </button>");
+	/*$("#buttons").append("<button id='askStarGameButton'> Start Game </button>");
 	$('#askStarGameButton').on("click", function(){
 		gameReadyToPlay();
-	})
+	})*/
+	
+	socket.emit('gameToPlay');
 }
 
 function showControlsStartToGame(message)
 {
 	$('#askStarGameButton').remove();
-	showInfoGame(message)
+	showInfoGame(message);
 	showIsMyTurnButton();
 }
 
 function showIsMyTurnButton()
 {
-	$('#isMyTurnButton').remove();
+	/*$('#isMyTurnButton').remove();
 	$("#buttons").append("<button id='isMyTurnButton'> Is my turn?</button>");
 	$('#isMyTurnButton').on("click", function(){
 		checkIsMyTurn($.cookie("uid"));
-	})
+	})*/
+	socket.emit('isMyTurn', $.cookie("uid"))
 }
 
 function showThrowDiceButton()
@@ -177,7 +180,8 @@ function showChangeTurnButton()
 		$('#buildButton').remove();
 		$('#buyButton').remove();
 		$('#changeTurnButton').remove();
-		changeMyTurn($.cookie("uid"));
+		//changeMyTurn($.cookie("uid"));
+		socket.emit('changeMyTurn', $.cookie("uid"))
 	})
 }
 
@@ -204,10 +208,8 @@ function getToken(name){
 		{
 			saveCookies(data);
 			showInfoUser(data.name, data.uid, data.color, data.money, data.position);
-			showStarGameButton();
-			
-		}
-		
+			showStarGameButton();			
+		}		
 		showLabelInfo();
 		showLabelsProperties();
 		showTitlePage();
@@ -217,31 +219,20 @@ function getToken(name){
 	})
 }
 
-function gameReadyToPlay()
+function showIsGameReadyToPlay(data)
 {
-	$.getJSON(url+"gameToPlay/", function(data){		
-		if(data.namePhase == "Playing")
-		{
-			showControlsStartToGame("Game Starts!");
-		}
-		else
-			showInfoGame("There are not all players, you have to wait")
-		
-	})
+    if(data.namePhase == "Playing")
+    	showControlsStartToGame("Game Starts!");
+    else
+		showInfoGame(data.info);
 }
 
-function checkIsMyTurn(uid)
+function showCheckIsMyTurn(data)
 {
-	$.getJSON(url+"isMyTurn/"+uid, function(data){		
-		if(data.turn)
-		{
-			showControlsGame();
-			//showInfoGame(data.infoGame);
-			//showInfoGame(data.infoToken);
-		}
-		else
-			showInfoGame("It is not your turn");		
-	})
+	if(data.turn && (data.uid == $.cookie("uid")))
+		showControlsGame();
+	else
+		showInfoGame(data.infoToken);		
 }
 
 function throwingDice(uid)
@@ -289,7 +280,12 @@ function build(uid, nameStreet)
 		showInfoGame(data.infoToken);	
 	})
 }
-function changeMyTurn(uid)
+
+function setTokenPlace (){
+	var x, y;
+	
+}
+/*function changeMyTurn(uid)
 {
 	$.getJSON(url+"changeMyTurn/"+uid, function(data){
 		if(data.isChanged)
@@ -299,3 +295,22 @@ function changeMyTurn(uid)
 		//showInfoGame(data.infoToken);	
 	})
 }
+*/
+
+// Sockets events
+
+socket.on('gameToPlay', function (data) {
+	showIsGameReadyToPlay(data);
+
+});
+
+socket.on('checkIsMyTurn', function (data){
+	showCheckIsMyTurn(data);
+})
+
+socket.on('changeMyTurn', function (data){
+	if(data.isChanged)
+		showIsMyTurnButton();
+	else
+		alert("Error");
+})

@@ -8,6 +8,7 @@ function InitialPhase(game)
 
 	this.addUser = function (user)
 	{
+		this.game.info = "There are not all the players, you have to wait"
 		return true;
 	}
 	this.throwingDice = function (token)
