@@ -1,0 +1,31 @@
+TABLA DE VALORACIÓN DEL TRABAJO
+
+1. Modelo probado (pruebas de Jasmine: más de 200 assertions) y funcionando (comprar, edificar, tarjetas Comunidad y Suerte, vender calles, vender casas, fin del juego, Carcel)
+2. Servidor REST y modelo probado (al menos 10 assertions de Jmeter) y funcionando (comprar, edificar, tarjetas Comunidad y Suerte, vender calles, vender casas, fin del juego, Carcel, salir)
+
+Aprobado:
+3. Cliente sin GUI ni sockets y servidor REST 
+4. Cliente sin GUI con sockets y servidor REST 
+
+Notable
+5. Cliente GUI básico (se muestra información del juego) con sockets y servidor REST
+6. El 5 y despliegue real (azure)
+7. El 6 y cliente GUI medio (las fichas se mueven por el tablero) 
+
+Sobresaliente
+8. El 7 e implementar hipotecar-subastar 
+9. El 8 y realizar pruebas con usuarios (no se incluye el desarrollador)
+
+Extras obligatorios:
+- Documentación del proyecto (para el Aprobado hay que documentar 5 sprints; para el Sobresaliente hay que documentar 8 sprints)
+- Pruebas (jasmine-node -no menos de 200 assertions- y Jmeter -no menos de 10 assertions-)
+
+Extras optativos:
+- Nuevas tarjetas
+- Gestión de partidas
+- Mejoras en la GUI (aquí hay muchos niveles posibles)
+- Gestión de credenciales (autenticación Passport)
+
+Sobre los errores:
+- Leves: pequeños fallos de interacción (se pueden asumir y quitan puntuación)
+- Graves: error 500 (no son asumibles, se considera el proyecto como no presentado)
