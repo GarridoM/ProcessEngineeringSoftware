@@ -5,32 +5,48 @@
 	<script src = "client/lib/jquery-cookie.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	
-	 <link href="client/css/bootstrap.min.css" rel="stylesheet">
-	 <link href="client/css/customStyle.css" rel="stylesheet">
+	<meta charset="utf-8">
+	<link rel="shortcut icon" type="image/x-icon" href="client/img/Monopoly.png" />
+	<link href="client/css/bootstrap.min.css" rel="stylesheet">
+	<link href="client/css/customStyle.css" rel="stylesheet">
 	<title>Monopoly</title>
 
 </head>
-<nav>
-	<div id="nav"></div>
 
-</nav>
 <body>
+
+	<div class="page-header" style = "text-align: center"><h1 id="titlePageMonopoly">Welcome to Monopoly</h1></div>
+	<nav class="navbar navbar-inverse">
+  		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+				    <span class="icon-bar"></span>
+				    <span class="icon-bar"></span>
+				    <span class="icon-bar"></span>                        
+				</button>
+				<a class="navbar-brand" href="http://server08-bd63j8ki.cloudapp.net/"><a><img src="client/img/monopolyLOGO.png" width = "180" height="51"></a></a>
+				
+			<div>
+	  	</div>
+	</nav>
+
 	<div class = "container-fluid">
-		<div class="page-header" style = "text-align: center">
-			<h1 id="titlePageMonopoly">Welcome to Monopoly</h1></div>
-			<div id = "leftSide" class= "col-md-3 col-xs-6 col-sm-4" style="">
+
+		<div id = "leftSide" class= "col-md-3 col-xs-6 col-sm-4" style="">
 			<div id = "results"></div>
+			<div id = "dices"></div>
 			<div id = "infoGame"></div>
-			<div id = "buttons"></div>
-			</div>
-			<div class="clearfix visible-xs-block"></div>
-			<div id = "middleSide" class="col-md-6 col-xs-6 col-sm-4" >
+			<div id = "buttons" class="btn-group"></div>
+		</div>
+			
+		<div class="clearfix visible-xs-block"></div>
+		<div id = "middleSide" class="col-md-6 col-xs-6 col-sm-4" >
 			<div id = "buttonsAsk"></div>
 			<canvas id = "boardGraphics" src= "" class="img-responsive" alt="" style="vertical-align:middle" height = "720" width="720"></canvas>			
-			</div>
+		</div>
 
-			<div class="clearfix visible-xs-block"></div>
-			<div id = "rightSide" class= "col-md-3 col-xs-6 col-sm-4" style="">
+		<div class="clearfix visible-xs-block"></div>
+		<div id = "rightSide" class= "col-md-3 col-xs-6 col-sm-4" style="">
 			<div id = "propertiesStreets"></div>
 			<div id = "propertiesStations"></div>
 			<div id = "propertiesPublicServices"></div>
@@ -39,9 +55,13 @@
 	<!--<canvas height="720" width="720" id = "boardGraphics"></canvas></img>-->
 	<script src = "client/js/monopoly-client.js"></script>
 	<script>start()</script>
-</body>
-<footer>
-	<div id="footer"></div>
+
+
+<footer id="footer" class="container-fluid text-center">
+
+	<p> Development by Marina Garrido Sánchez </p>
 
 </footer>
+
+</body>
 </html>

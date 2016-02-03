@@ -1,3 +1,5 @@
+
+var _=require("underscore");
 function Token (color)
 {
 	this.color = color;
@@ -5,8 +7,11 @@ function Token (color)
 	this.position = 0;
 	this.money = 1500;
 	this.properties = [];
-	this.stations = [];
+	this.stationsProperties = [];
 	this.publicServices = [];
+	this.mortagedPublicServices = [];
+	this.mortagedProperties = [];
+	this.mortagedStations = [];
 	this.jail = false;
 	this.cardGoOutJail = false;
 	this.timesTriedGoOut = 0;
@@ -32,8 +37,8 @@ function Token (color)
 	{
 		var propersGroup = [];
 		propersGroup = _.find(this.properties, function(each){
-			if((each.state)instanceof(Group))
-				return this.properties.color;
+			if(each.state.name == "Group")
+				return each;
 		})
 		return propersGroup;
 	}

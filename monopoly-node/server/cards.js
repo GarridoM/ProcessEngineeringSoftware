@@ -32,7 +32,7 @@ function GoHead(msg, mount)
 	this.execute = function(token)
 	{
 		console.log(this.msg)
-		token.info = token.info + "<p><strong> You have get: </strong>" + this.msg + "</p>"
+		token.info = token.info + "<strong> You have get: </strong>" + this.msg 
 		token.position = token.position + this.mount;
 	}
 }
@@ -45,7 +45,7 @@ function GoBack(msg, mount)
 	this.execute = function(token)
 	{
 		console.log(this.msg)
-		token.info = token.info + "<p><strong> You have get: </strong>" + this.msg + "</p>"
+		token.info = token.info + "<strong> You have get: </strong>" + this.msg
 		token.position = token.position - this.mount;
 	}
 }
@@ -57,7 +57,7 @@ function Penalty(msg, mount)
 	this.execute=function(token)
 	{
 		console.log(this.msg)
-		token.info = token.info + "<p><strong> You have get: </strong>" + this.msg + "</p>"
+		token.info = token.info + "<strong> You have get: </strong>" + this.msg 
 		token.money = token.money - this.mount;
 	}
 }
@@ -70,7 +70,7 @@ function Prize(msg, mount)
 	this.execute = function(token)
 	{
 		console.log(this.msg)
-		token.info = token.info + "<p><strong> You have get: </strong>" + this.msg + "</p>"
+		token.info = token.info + "<strong> You have get: </strong>" + this.msg
 		token.money = token.money - this.mount;
 	}
 }
@@ -81,7 +81,7 @@ function cardGoOutJail(msg)
 	this.execute = function(token)
 	{
 		console.log(this.msg)
-		token.info = token.info + "<p><strong> You have get: </strong>" + this.msg + "</p>"
+		token.info = token.info + "<strong> You have get: </strong>" + this.msg
 		token.cardGoOutJail = true;
 	}
 }

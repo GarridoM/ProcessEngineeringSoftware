@@ -109,7 +109,7 @@ describe("Monopoly", function(){
 
 			for(i = 0; i < numberBoxes; i++)
 			{
-				if(board.boxes[i].theme.type == "public Services")
+				if(board.boxes[i].theme.type == "PublicServices")
 				{
 					times++
 				}
@@ -362,15 +362,15 @@ describe("Monopoly", function(){
 		it("deberá de tener una fase Juego", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);
-			expect(game.phase.name).toBe("Playing...")			
+			expect(game.phase.name).toBe("Playing")			
 		})
 
 		it("debera de tener una fase Fin", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);
 			//usr1.throwingDice();
-			usr1.throwingDiceTest(1);
 			usr1.Token.setMoney(20000)
+			usr1.throwingDiceTest(1);			
 			usr1.passTurn();
 			//usr2.throwingDice();
 			usr2.throwingDiceTest(1);
@@ -382,36 +382,40 @@ describe("Monopoly", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);
 			//usr1.throwingDice();
-			usr1.throwingDiceTest(1);
 			usr1.Token.setMoney(20000)
+			usr1.throwingDiceTest(1);			
 			usr1.passTurn();
 			//usr2.throwingDice();
 			usr2.throwingDiceTest(1);
 			usr2.passTurn();			
-			expect(game.winner).toBe(usr1)				
+			expect(game.winner).toBe(usr1.uid)				
 		})
 		it("deberá de tener un usuario llamado Lola", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);			
-			expect(game.players[0].name).toBe("Lola")
+			expect(game.players[0].name).toBe("Lola");
 		})
 
 		it("deberá de tener un usuario llamado Luis", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);
-			expect(game.players[1].name).toBe("Luis")
+			expect(game.players[1].name).toBe("Luis");
 		})
 
-		it("permite añadir jugadores hasta completar el numero de fichas", function(){
-
+		it("no permite añadir jugadores hasta completar el numero de fichas", function(){
+			game.addUser(usr1);
+			game.addUser(usr2);
+			usr3 = new muser.User("John");
+			game.addUser(usr3)
+			expect(game.info).toBe("It is so late! You cannot play in this game :S");
 		})
 
 
 	})
 
-	describe("Calles", function(){
+	describe("El usuario", function(){
 
-		it("el usuario podra comprar una calle", function(){
+		it("podra comprar una calle", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);
 			usr1.throwingDiceTest(8);
@@ -420,7 +424,7 @@ describe("Monopoly", function(){
 			//expect(usr1.Token.money).toBe(1400)
 		})
 
-		it("el usuario deberá de pagar la calle comprada", function(){
+		it("deberá de pagar la calle comprada", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);
 			usr1.throwingDiceTest(8);
@@ -428,7 +432,7 @@ describe("Monopoly", function(){
 			expect(usr1.Token.money).toBe(1400)
 		})
 
-		it("el usuario deberá de pagar el alquiler al caer en una calle que no es suya", function(){
+		it("deberá de pagar el alquiler al caer en una calle que no es suya", function(){
 			game.addUser(usr1);
 			game.addUser(usr2);
 			usr1.throwingDiceTest(8);
@@ -439,7 +443,61 @@ describe("Monopoly", function(){
 
 		})
 
-		it("el usuario no podrá construir si no tiene todas las calles de un grupo", function(){
+		it("podra construir cuando tenga las calles de un grupo", function(){
+			console.log("const");
+			game.addUser(usr1);
+			game.addUser(usr2);
+			usr1.throwingDiceTest(6);
+			usr1.buy();
+			usr1.passTurn();
+
+			usr2.throwingDiceTest(3);
+			usr2.passTurn();
+
+			usr1.throwingDiceTest(2);
+			usr1.buy();
+			usr1.passTurn();
+
+			usr2.throwingDiceTest(3);
+			usr2.passTurn();
+			
+			usr1.throwingDiceTest(1);
+			usr1.buy();
+			usr1.build("purple")
+			expect(usr1.Token.info).toBe(" Congratulations! You build another house");			
+
+		})
+
+		it("va a la carcel si cae en Ir a la carcel", function(){
+			game.addUser(usr1);
+			game.addUser(usr2);
+			usr1.throwingDiceTest(30);
+			expect(usr1.Token.position).toBe(10);
+		})
+
+		it("debera de poder salir de la carcel pagando", function(){
+			game.addUser(usr1);
+			game.addUser(usr2);
+			usr1.throwingDiceTest(30);
+			usr2.throwingDiceTest(2);
+			usr2.passTurn();
+
+			expect(usr1.goOutJail(1)).toBe(true);
+		})
+
+		it("debera de poder salir de la carcel si tiene la carta", function(){
+			game.addUser(usr1);
+			game.addUser(usr2);
+			usr1.Token.cardGoOutJail = true;
+			usr1.throwingDiceTest(30);
+			usr2.throwingDiceTest(2);
+			usr2.passTurn();
+
+			expect(usr1.goOutJail(2)).toBe(true);
+		})
+
+		it("podrá hipotecar", function(){
+			console.log("HIPOTECANDOOOOO")
 			game.addUser(usr1);
 			game.addUser(usr2);
 			usr1.throwingDiceTest(6);
@@ -459,9 +517,9 @@ describe("Monopoly", function(){
 			usr1.throwingDiceTest(1);
 			usr1.buy();
 			
-
+			expect(usr1.mortgage()).toBe(true);	
+			console.log("----------------------")
 		})
-
 	})
 
 	describe("La ficha", function(){
@@ -473,16 +531,5 @@ describe("Monopoly", function(){
 		})
 	})
 
-	describe("El usuario", function(){
-		it("va a la carcel si cae en Ir a la carcel", function(){
-			game.addUser(usr1);
-			game.addUser(usr2);
-			usr1.throwingDiceTest(30);
-			expect(usr1.Token.position).toBe(10);
-		})
-	})
 
-	describe("El usuario", function(){
-		it("")
-	})
 })

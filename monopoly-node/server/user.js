@@ -77,11 +77,21 @@ function User(name, game){
 	}
 	this.build = function(colorGroup)
 	{
-		this.Game.build(this.Token, colorGroup);
+		return this.Game.build(this.Token, colorGroup);
 	}
 	this.goOutJail = function(optionChoosen)
 	{
-		this.Game.goOutJail(this.Token, optionChoosen)
+		console.log(optionChoosen + " 1");
+		return this.Game.goOutJail(this.Token, optionChoosen)
+	}
+	this.mortgage = function()
+	{
+		console.log("hipotecando")
+		return this.Game.mortgage(this.Token);
+	}
+	this.sellBuildings = function()
+	{
+		return this.Game.sellBuildings(this.Token);
 	}
 }
 

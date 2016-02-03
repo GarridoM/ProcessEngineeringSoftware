@@ -108,14 +108,29 @@ function Board(numberBoxes)
 	{
 		return this.boxes[token.position].buy(this, token);
 	}
+
+	this.sellBuildings = function(token)
+	{
+		return this.boxes[token.position].sellBuildings(token);
+	}
 	this.build = function(token, colorGroup)
 	{
-		this.boxes[token.position].build(token, colorGroup)
+		return this.boxes[token.position].build(token, colorGroup)
 	}
 	this.goOutJail = function(game, token, optionChoosen)
 	{
-		this.boxes[token.position].goOutJail(game, token, optionChoosen)
+		console.log(game);
+		console.log(token);
+		console.log(optionChoosen + " 3");
+		return this.boxes[token.position].goOutJail(game, token, optionChoosen)
 	}
+
+	this.mortgage = function(token)
+	{
+		console.log("hipotecando")
+		return this.boxes[token.position].mortgage(token);
+	}
+
 	this.startBoard();
 }
 
@@ -134,13 +149,25 @@ function Box(theme)
 	{
 		return this.theme.buy(board, token);
 	}
+	this.sellBuildings = function(token)
+	{
+		return this.theme.sellBuildings(token);
+	}
 	this.build = function(token, colorGroup)
 	{
-		this.theme.build(token, colorGroup)
+		return this.theme.build(token, colorGroup)
 	}
-	this.goOutJail=function(token, optionChoosen)
+	this.goOutJail=function(game, token, optionChoosen)
 	{
-		this.theme.build(token, optionChoosen)
+		console.log(game);
+		console.log(token);
+		console.log(optionChoosen + " 4");
+		return this.theme.goOutJail(game, token, optionChoosen)
+	}
+	this.mortgage = function(token)
+	{
+		console.log("hipotecando...")
+		return this.theme.mortgage(token);
 	}
 }
 
@@ -160,6 +187,7 @@ function Street(price, name, color)
 	this.type = "Street"
 	this.numberHouses = 0;
 	this.hotel = false;
+	this.stateMortgage=false;
 	this.moveToken = function(game, token)
 	{
 		console.log("Esta en " + this.name + " En la posicion " + token.position);
@@ -177,8 +205,18 @@ function Street(price, name, color)
 	}
 	this.build = function(token, colorGroup)
 	{
-		this.state.buildHouse(token, colorGroup)
+		return this.state.buildHouse(token, colorGroup)
 	}
+	this.mortgage = function(token)
+	{
+		console.log("hipotecando")
+		return this.state.mortgage(token, this);
+	}
+	this.sellBuildings = function(token)
+	{
+		return this.state.sellBuildings(token, this);
+	}
+
 }
 
 function communityChest()
@@ -194,7 +232,19 @@ function communityChest()
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
-		token.info = "No se puede comprar";
+		token.info = "It is NOT available to buy";
+	}
+	this.mortgage = function(token)
+	{
+		token.info = "It is NOT mortgaged"
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
 	}
 }
 
@@ -214,6 +264,18 @@ function Chance()
 		console.log("No se puede comprar")
 		token.info = "No se puede comprar";
 	}
+	this.mortgage = function(token)
+	{
+		token.info = "It is NOT mortgaged"
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
+	}
 }
 function Station(name)
 {
@@ -229,13 +291,26 @@ function Station(name)
 		this.state.moveToken(token, this)
 		if(this.proper != undefined && this.proper != token) this.payRenting();
 	}
-	this.buy = function(token)
+	this.buy = function(board, token)
 	{
 		return this.state.buyProper(token, this)
 	}
 	this.payRenting = function(token)
 	{
 		this.state.payRenting(token, this);
+	}
+	this.mortgage = function(token)
+	{
+		return this.state.mortgage(token, this);
+	}
+
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
 	}
 }
 
@@ -245,7 +320,8 @@ function publicServices(price, name)
 	this.name = name;
 	this.proper = undefined;
 	this.stateBuy = false;
-	this.type = "public Services"
+	this.stateMortgage = false;
+	this.type = "PublicServices"
 
 	this.moveToken = function(game, token)
 	{
@@ -256,26 +332,67 @@ function publicServices(price, name)
 	}
 	this.buy = function(board, token)
 	{
+		/*console.log("Proceso Compraaaaa")
+		console.log(this.price);
+		console.log(token.money);
+		console.log(this.stateBuy);*/
 		if(this.stateBuy == false)
 		{
-			this.stateBuy = true;
-			this.proper = token;
-			token.publicServices[token.publicServices.length] = this;
-			token.money = token.money - this.price;
-			token.info = "You have bought!! Now, you have " + token.money;
-			return true;
+			if(this.price > token.money)
+			{
+				token.info = "You do NOT have enough money";
+				return false;
+			}
+			else
+			{
+				this.stateBuy = true;
+				this.proper = token;
+				token.publicServices[token.publicServices.length] = this;
+				token.money = token.money - this.price;
+				token.info = "You have bought!! Now, you have " + token.money;
+				return true;
+			}
 		}
 		else
 		{
 			console.log("Ya esta comprada")
-			token.info = "Ya esta comprada";
+			token.info = "It is NOT free";
 			return false;
 		}
 			
 	}
 	this.payRenting = function(token)
 	{
-		token.money = token.money - 30;
+		if(this.stateMortgage == false)
+			token.money = token.money - 30;
+		else
+			token.info = "You do NOT pay because It is mortgaged"
+	}
+
+	this.mortgage = function(token)
+	{
+		if(this.stateMortgage == false)
+		{
+			this.stateMortgage = true;
+			token.info = "You receive " + this.price*1.25;
+			token.money = token.money + this.price*1.25;
+			token.mortagedPublicServices[token.mortagedPublicServices.length] = this;
+			return true;
+		}
+		else
+		{
+			token.info = "It is mortgaged"
+			return false;
+		}
+
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
 	}
 
 }
@@ -289,33 +406,79 @@ function Jail()
 	}
 	this.goOutJail = function(game, token, optionChoosen)
 	{
-		if(optionChoosen == "Pagar")
+		console.log(game);
+		console.log(token);
+		console.log(optionChoosen + " 5");
+		console.log("OPTION: " + optionChoosen)
+		if(optionChoosen == 1)
 		{
+			console.log("Pagando")
 			token.money = token.money - 100;
 			token.jail = false;
+			token.info = token.info + "You are out"
+			return true;
 		}
-		else if (optionChoosen == "Carta")
+		else if (optionChoosen == 2)
 		{
+			console.log("Cartaaa")
 			if(token.cardGoOutJail)
+			{
 				token.jail = false;
+				token.info = token.info + "You are out"
+				return true;
+			}
+			else
+			{
+				token.info = token.info + "Sorry, you are NOT out"
+				return false;
+			}		
 		}
-		else if (optionChoosen == "Sacar Doble")
+		else if (optionChoosen == 3)
 		{
 			if(token.timesTriedGoOut < 4)
 			{
-				game.throwingDice(token)
-			}
+				if(game.throwingDiceGoOut(token))
+				{
+					token.jail = false;
+					token.info = token.info + "You are out"
+					return true;
+				}
+				else
+				{
+					token.info = token.info + "Sorry, you are NOT out"
+					return false;
+				}					
+			}				
 			else
-				this.goOutJail(token, "Pagar");
+			{
+				token.info = token.info + "You have to pay to go out"
+				this.goOutJail(game, token, "Pagar");
+			}
+				
 		}
 
 	}
+
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
-		token.info = "No se puede comprar"
+		token.info = token.info + "Yo can NOT buy"
+	}
+
+	this.mortgage = function(token)
+	{
+		token.info = token.info + "It is NOT mortgaged"
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = token.info + "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = token.info + "You can NOT build in this box"
 	}
 }
+
 function Tax(price, name)
 {
 	this.price = price;
@@ -330,11 +493,24 @@ function Tax(price, name)
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
-		token.info = "No se puede comprar";
+		token.info = "I can NOT buy";
 	}
 	this.paying = function(token)
 	{
 		token.money = token.money - this.price;
+	}
+
+	this.mortgage = function(token)
+	{
+		token.info = "It is NOT mortgaged"
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
 	}
 
 }
@@ -350,7 +526,19 @@ function freeParking()
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
-		token.info = "No se puede comprar";
+		token.info = "You can NOT buy";
+	}	
+	this.mortgage = function(token)
+	{
+		token.info = "It is NOT mortgaged"
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
 	}
 }
 function goToJail()
@@ -366,15 +554,29 @@ function goToJail()
 	this.goJail = function(game, token)
 	{
 		token.jail = true;
+		//game.changedTurn();
 		token.setPosition(10);
 		console.log("Go to the Jail!")
 		token.info = "Go to the Jail!"
-		game.changedTurn();
+		
 	}
 	this.buy = function(board, token)
 	{
 		console.log("No se puede comprar")
-		token.info = "No se puede comprar"
+		token.info = "You can NOT buy"
+	}
+
+	this.mortgage = function(token)
+	{
+		token.info = "It is NOT mortgaged"
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
 	}
 }
 
@@ -395,12 +597,25 @@ function Exit()
 	{
 		token.setMoney(200);
 		console.log("Tu salario a subido en 200 pelotis, ahora tienes " + token.money)
-		token.info = "Tu salario a subido en 200 pelotis, ahora tienes " + token.money;
+		token.info = "You receive 200 pelotis, now you have " + token.money;
 	}
 	this.buy = function(board,token)
 	{
 		console.log("No se puede comprar")
-		token.info = ("No se puede comprar")
+		token.info = ("You can NOT buy")
+	}
+
+	this.mortgage = function(token)
+	{
+		token.info = "It is NOT mortgaged"
+	}
+	this.sellBuildings = function(token)
+	{
+		token.info = "This king of Box has NOT got Buildings"
+	}
+	this.build = function(token, colorGroup)
+	{
+		token.info = "You can NOT build in this box"
 	}
 }
 

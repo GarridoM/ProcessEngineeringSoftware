@@ -1,0 +1,4 @@
+npm install node.js -g 
+npm install express
+npm install underscore.js -g
+npm install socket.io

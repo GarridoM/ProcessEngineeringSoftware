@@ -1,12 +1,47 @@
-var url = "http://127.0.0.1:1337/";
+var url = "http://127.0.0.1:80/";
+//var url = "http://server08-bd63j8ki.cloudapp.net/"
+//var url = "http://procesos-w03fktfd.cloudapp.net/"
 var socket = io();
 var coord=[];
 //var colorToken=["red","blue","green","black","yellow","grey"];
 //var tokens={list:colorToken}
+var propertiesList = [];
+var propertiesName = [];
+var propertiesColor = [];
+var stationsProperties = [];
+var publicServicesProperties = [];
 
 function start()
 {
-	showButtonAskToken();
+	if($.cookie("uid") == undefined)
+		showButtonAskToken();
+	else{
+
+		$.getJSON(url+"update/" + $.cookie("uid"), function(data){
+			if(data.namePhase == "Initial")
+			{
+				if(data.position != -1)
+					showStartingGame(data);		
+				else
+					alert(data.infoGame)
+			}
+			else if (data.namePhase == "Playing")
+			{
+				console.log("updating...")
+				showStartingGame(data);
+				showTableProperties();
+				showTableStations();
+				showTablePublicServices();
+			}
+			else
+			{
+				alert("The game has ended")
+			}
+
+		})
+
+	}
+
 }
 
 function saveCookies(gamerUser)
@@ -16,25 +51,27 @@ function saveCookies(gamerUser)
 	$.cookie("money", gamerUser.money)
 	$.cookie("position", gamerUser.position)
 	$.cookie("colorToken", gamerUser.color)
+	$.cookie("secondPass", false);
 	//$.cookie("timesMessage", 0)
 }
 
 //Functions to modify the file index.html
 function showLabelInfo()
 {
+	$("#infoGame").addClass("infoGameClass");
 	$("#infoGame").append("<p> <label id='infoGameLabelGrap'> <strong> Info: </strong></label></p>")
 }
 
 function showLabelsProperties()
 {
-	$("#propertiesStreets").append("<p> <label id='infoStreetLabel'> <strong> Streets' Properties: </strong></label></p>")
-	$("#propertiesStations").append("<p> <label id='infoStreetLabel'> <strong> Stations' Properties: </strong></label></p>")
-	$("#propertiesPublicServices").append("<p> <label id='infoStreetLabel'> <strong> Public Services' Properties: </strong></label></p>")
+	$("#propertiesStreets").append("<p> <div id='infoStreetLabel' class= 'table-responsive'><table class='table'><thead><tr><th>Street</th><th>Color</th></tr></thead></table></div></p>")
+	$("#propertiesStations").append("<p> <div id='infoStationsLabel' class= 'table-responsive'><table class='table'><tr><th>Station</th></tr></table></div></p>")
+	$("#propertiesPublicServices").append("<p> <div id='infoPublicServicesLabel' class= 'table-responsive'><table class='table'><tr><th>Public Service</th></tr></table></div></p>")
 }
 
 function showButtonAskToken()
 {
-	$("#buttonsAsk").append("<p id='askArea' style = 'text-align: center'> <label style= 'margin-right: 5px'> Nick: </label><input type ='text' id='name' placeholder='Nick'/><button class='btn btn-primary active' style='margin-left: 5px' id='askTokenButton'> Ask Token </button></p>");
+	$("#buttonsAsk").append("<p id='askArea' style = 'text-align: center'> <label style= 'margin-right: 5px'> Nick: </label><input type ='text' id='name' placeholder='Nick'/><button class='btn btn-success' style='margin-left: 5px' id='askTokenButton'> Ask Token </button></p>");
 	$('#askTokenButton').on("click", function(){
 		getToken($("#name").val());
 	})
@@ -58,10 +95,10 @@ function showBoardGame()
 
 function showInfoUser(name, uid, color, money, position){
 	showName(name);
-	showUid(uid);
-	showColorToken(color);
+	//showUid(uid);	
 	showMoneyToken(money);
 	showPositionToken(position);
+	showColorToken(color);
 	showInitialGraphs();
 	//showBoardGame();
 }
@@ -234,31 +271,32 @@ function loadCoordinates (){
 function showName(name)
 {
 	$("#name").remove();
-	$("#results").append("<p id='name'>Nick: " + name + "</p>")
+	$("#results").append("<p id='name'><strong> Nick: </strong> " + name + "</p>")
 }
 
 function showUid(uid)
 {
 	$("#uid").remove();
-	$("#results").append("<p id='uid'>Uid: " + uid + "</p>")
+	$("#results").append("<p id='uid'><strong>Uid: </strong>" + uid + "</p>")
 }
 
 function showColorToken(color)
 {
 	$("#tokenColor").remove();
-	$("#results").append("<p id='tokenColor'>Color: "+ color+"</p>")
+	//$("#results").append("<p id='tokenColor'>Color: "+ color+"</p>")
+	$("#results").append("<img id='tokenColor' src = 'client/img/"+ color+".png' width = 32 height = 32 >")
 }
 function showMoneyToken(money)
 {
 	$("#tokenMoney").remove();
-	$("#results").append("<p id='tokenMoney'>Money: "+ money+"</p>")
+	$("#results").append("<p id='tokenMoney'><strong>Money: </strong>"+ money+"</p>")
 	$.cookie("money", money);
 }
 
 function showPositionToken(position)
 {
 	$("#tokenPosition").remove();	
-	$("#results").append("<p id='tokenPosition'>Position: "+ position+"</p>")
+	$("#results").append("<p id='tokenPosition'><strong>Position: </strong>"+ position+"</p>")
 	$.cookie("position", position)
 }
 
@@ -273,22 +311,97 @@ function showInfoGame(message)
 		$("#infoGame").remove();
 		$.cookie("timesMessage") = 0;
 	}*/
-
+	$("#infoMensa").remove();
 	if(message != undefined)
 	{
-		$("#infoMensa").remove();
-		$("#infoGame").append("<p id='infoMensa'>" + message+"</p>")
+		//$("#infoMensa").remove();
+		//$("#infoMensa").remove();
+		$("#infoGame").append("<div id='infoMensa'>" + message+"</div>")
 	}
 }
 
-function showPropertiesUser(propertyName, propertyType)
+function showPropertiesUser(data)
 {
-	if(propertyType == 'Street')
-		$("#propertiesStreets").append("<p id='propertiesStreetInfo'>" + propertyName + " " +"</p>")
-	else if (propertyType == 'Station')
-		$("#propertiesStations").append("<p id='propertiesStationInfo'>" + propertyName + "</p>")
-	else
-		$("#propertiesPublicServices").append("<p id='propertiesPublicServiceInfo'>" + propertyName +"</p>")
+	if(data.propertyBoughtType == 'Street')
+	{
+		saveProperty(data);
+		showTableProperties();		
+	}		
+	else if (data.propertyBoughtType == 'Station')
+	{
+		saveStations(data);
+		showTableStations();
+	}		
+	else if (data.propertyBoughtType == 'PublicServices')
+	{
+		savePublicServices(data);
+		showTablePublicServices();
+	}		
+}
+
+function saveProperty(data)
+{
+	propertiesList.push(data);
+	$.cookie("street", JSON.stringify(propertiesList));		
+}
+
+function showTableProperties ()
+{
+	$('#streetTable').remove();
+	var stringHeadTable = "<div id='streetTable' class= 'table-responsive'><table class='table table-bordered'><thead><tr class='success'><th>Street</th><th>Color</th></tr></thead> <tbody>";
+	var stringRowTable = "";	
+	var localProperties = JSON.parse($.cookie("street"));
+	
+
+	for (i = 0; i < localProperties.length; i++) {
+		stringRowTable = stringRowTable + "<tr><th>"+ localProperties[i].propertyBought + "</th><th>" + localProperties[i].colorProperty + "</th></tr>"
+	};
+	
+	stringRowTable = stringRowTable + "</tbody></table></div>";
+
+	$("#propertiesStreets").append(stringHeadTable + stringRowTable);
+}
+function saveStations (data)
+{
+	stationsProperties.push(data.propertyBought);
+	$.cookie("stationProper", JSON.stringify(stationsProperties));
+}
+function showTableStations()
+{
+	$('#stationsTable').remove();
+	var stringHeadTable = "<div id='stationsTable' class= 'table-responsive'><table class='table table-bordered'><thead><tr class='success'><th>Stations</th></tr></thead> <tbody>";
+	var stringRowTable = "";
+	var localStations = JSON.parse($.cookie("stationProper"));
+
+	for(i=0; i< localStations.length; i++)
+	{
+		stringRowTable = stringRowTable + "<tbody><tr><th>"+ localStations[i] + "</th></tr>"
+	}
+	
+	stringRowTable = stringRowTable + "</tbody></table></div>";
+
+	$("#propertiesStations").append(stringHeadTable + stringRowTable);
+}
+function savePublicServices (data)
+{
+	publicServicesProperties.push(data.propertyBought);
+	$.cookie("publicService", JSON.stringify(publicServicesProperties));
+}
+function showTablePublicServices()
+{
+	$('#publicServicesTable').remove();
+	var stringHeadTable = "<div id='publicServiceTable' class= 'table-responsive'><table class='table table-bordered'><thead><tr class='success'><th>Public Service</th></tr></thead> <tbody>";
+	var stringRowTable = "";
+	var localPublicService = JSON.parse($.cookie("publicService"));
+
+	for(i=0; i<localPublicService.length; i++)
+	{
+		stringRowTable = stringRowTable + "<tbody><tr><th>"+ localPublicService[i] + "</th></tr>"
+	}
+	
+	stringRowTable = stringRowTable + "</tbody></table></div>";
+
+	$("#propertiesPublicServices").append(stringHeadTable + stringRowTable);	
 }
 
 function showPropertiesWithBuilding(propertyName, numberOfHouses)
@@ -300,10 +413,10 @@ function showStarGameButton()
 	socket.emit('gameToPlay');
 }
 
-function showControlsStartToGame(message)
+function showControlsStartToGame()
 {
 	$('#askStarGameButton').remove();
-	showInfoGame(message);
+	//showInfoGame(message);
 	showIsMyTurnButton();
 }
 
@@ -314,7 +427,7 @@ function showIsMyTurnButton()
 
 function showThrowDiceButton()
 {
-	$("#buttons").append("<button id='throwDiceButton'> Throw Dice</button>");
+	$("#buttons").append("<button class='btn btn-success' id='throwDiceButton'> Throw Dice</button>");
 	$('#throwDiceButton').on("click", function(){
 		throwingDice($.cookie("uid"));
 	})
@@ -322,33 +435,59 @@ function showThrowDiceButton()
 
 function showBuildButton(listGroupsColors)
 {
+	$("#listGroupsToBuild").remove();
+	$("#buildButton").remove();
 	var cadena= " ";
 	for (i=0; i< listGroupsColors.length; i++) {
 		cadena = cadena + "<option>"+ listGroupsColors[i] + "</option>"
 	};
-	$("#buttons").append("<select id='listGroupsToBuild'>"+ cadena +"</select><button id='buildButton'> Build </button>");
+	$("#buttons").append("<select class='form-control' id='listGroupsToBuild'>"+ cadena +"</select><button id='buildButton'> Build </button>");
 	$('#buildButton').on("click", function(){
-		build($.cookie("uid"), $("listGroupsToBuild option:selected").text());
+		build($.cookie("uid"), $("#listGroupsToBuild option:selected").text());
 	})
 }
 
 function showBuyButton()
 {
 	$('#buyButton').remove();
-	$("#buttons").append("<button id='buyButton'> Buy </button>");
+	$("#buttons").append("<button class='btn btn-success' id='buyButton'> Buy </button>");
 	$('#buyButton').on("click", function(){
 		buy($.cookie("uid"));
+	})
+}
+
+function showSellingButton()
+{
+	$('#sellButton').remove();
+	$("#buttons").append("<button class='btn btn-success' id='sellButton'> Sell Buildings </button>");
+	$('#sellButton').on("click", function(){
+		sell($.cookie("uid"));
+	})
+}
+
+function showMortgageButton()
+{
+	$('#mortgageButton').remove();
+	$("#buttons").append("<button class='btn btn-success' id='mortgageButton'> Mortgage </button>");
+	$('#mortgageButton').on("click", function(){
+		mortgage($.cookie("uid"));
 	})
 }
 
 function showChangeTurnButton()
 {		
 	$('#changeTurnButton').remove();
-	$("#buttons").append("<button id='changeTurnButton'> Finish my turn</button>");
+	$("#buttons").append("<button class='btn btn-success' id='changeTurnButton'> Finish my turn</button>");
 	$('#changeTurnButton').on("click", function(){
 		$('#throwDiceButton').remove();
+		$("#payToGoButton").remove();
+		$("#doubleToGoButton").remove();
+		$("#cardToGoButton").remove();
+		$("#listGroupsToBuild").remove();
 		$('#buildButton').remove();
 		$('#buyButton').remove();
+		$('#sellButton').remove();
+		$('#mortgageButton').remove();
 		$('#changeTurnButton').remove();
 		//changeMyTurn($.cookie("uid"));
 		socket.emit('changeMyTurn', $.cookie("uid"))
@@ -366,33 +505,82 @@ function showTitlePage()
 {
 	var element = document.getElementById("titlePageMonopoly")
 	element.innerHTML = "Monopoly";
+	//$("#leftSide").addClass("leftSideClass");
 
 }
 
+function showStartingGame(data)
+{
+	saveCookies(data);
+	showInfoUser(data.name, data.uid, data.color, data.money, data.position);
+	showStarGameButton();		
+	showLabelInfo();
+	//showLabelsProperties();
+	showTitlePage();
+	showInfoGame(data.infoToken);
+	showInfoGame(data.infoGame);
+
+}
+
+function showDicesGame(diceOne, diceTwo)
+{
+	$('#dicesArea').remove();
+	$("#dices").append("<p id='dicesArea'><img src='client/img/"+ diceOne +".png' width=32 height=32> <img src='client/img/"+ diceTwo +".png' width=32 height=32></p>")
+}
+
+
+function showOptionsToGoOut()
+{
+	showButtonPayToGo();
+	showButtonDoubleToGo();
+	if($.cookie("cardGoOutJail"))
+		showButtonCardToGoOut();
+}
+
+function showButtonPayToGo()
+{
+	$("#buttons").append("<button class='btn btn-success' id='payToGoButton'> Pay </button>");
+	$('#payToGoButton').on("click", function(){
+		goOutOfJail($.cookie("uid"), 1);
+	})	
+}
+
+function showButtonDoubleToGo()
+{
+	$("#buttons").append("<button class='btn btn-success' id='doubleToGoButton'> Try Double </button>");
+	$('#doubleToGoButton').on("click", function(){
+		goOutOfJail($.cookie("uid"), 3);
+	})	
+}
+
+function showButtonCardToGoOut()
+{
+	$("#buttons").append("<button class='btn btn-success' id='cardToGoButton'> Use Card </button>");
+	$('#cardToGoButton').on("click", function(){
+		goOutOfJail($.cookie("uid"), 2);
+	})	
+}
+//////////////////////////////////////////////////////////////////////////////
 //Functions to connect with the server
+/////////////////////////////////////////////////////////////////////////////
 function getToken(name){
 	$.getJSON(url+"newUser/"+name, function(data){
 		
 		$("#askArea").remove();
 		if(data.position != -1)
-		{
-			saveCookies(data);
-			showInfoUser(data.name, data.uid, data.color, data.money, data.position);
-			showStarGameButton();			
-		}		
-		showLabelInfo();
-		showLabelsProperties();
-		showTitlePage();
-		showInfoGame(data.infoToken);
-		showInfoGame(data.infoGame);
-
+			showStartingGame(data);		
+		else
+			alert(data.infoGame)
 	})
 }
 
 function showIsGameReadyToPlay(data)
 {
     if(data.namePhase == "Playing")
-    	showControlsStartToGame("Game Starts!");
+    {
+    	alert("Game Starts!")
+    	showControlsStartToGame();    	
+    }
     else
 		showInfoGame(data.info);
 }
@@ -407,17 +595,170 @@ function showCheckIsMyTurn(data)
 
 function throwingDice(uid)
 {	
+	$("#payToGoButton").remove();
+	$("#doubleToGoButton").remove();
+	$("#cardToGoButton").remove();
 	$.getJSON(url+"throwingDice/"+uid, function(data){
 		//removeToken();
 		//var positionBefore = $.cookie("position");
-		showPositionToken(data.position)
-		showMoneyToken(data.money)	
-		showInfoGame(data.infoGame + "<p>" + data.infoToken);
-		//showInfoGame(data.infoToken);
-		showBuyButton();
-		showChangeTurnButton();		
-		//loadToken(setToken);
-		reloadPositionGraphs();
+		if(data.winner == undefined)
+		{
+			if(data.jail == false)
+			{
+				showPositionToken(data.position)
+				showMoneyToken(data.money)	
+				showInfoGame(data.infoToken);
+				//showInfoGame(data.infoToken);
+				showDicesGame(data.diceOne, data.diceTwo);
+				showBuyButton();
+				showSellingButton();
+				showMortgageButton();
+				showChangeTurnButton();		
+				//loadToken(setToken);
+				reloadPositionGraphs();
+				$.cookie("cardGoOutJail", data.cardGoOutJail);
+				$.cookie("jail", data.jail);
+			}
+			else
+			{
+				showDicesGame(data.diceOne, data.diceTwo);
+				showPositionToken(data.position);
+				alert(data.infoToken)
+				showInfoGame(data.infoToken);
+				//showChangeTurnButton();	
+				reloadPositionGraphs();			
+				$.cookie("cardGoOutJail", data.cardGoOutJail);
+				$.cookie("jail", data.jail);
+				
+				$('#throwDiceButton').remove();
+				
+				if(($.cookie("secondPass")) == false)
+				{
+					$.cookie("secondPass", true);
+					socket.emit('changeMyTurn', $.cookie("uid"))				
+				}
+				else
+				{				
+					showInfoGame("You are in the Jail, you have to decide how to go out")
+					showOptionsToGoOut();
+				}			
+			}
+		}
+		else //if(data.namePhase == "End Game")
+		{
+			showWinner(data);
+			
+		}
+		/*else
+		{
+			alert("Error")
+		}*/
+	})
+}
+
+function showWinner(data)
+{
+	socket.emit('showWinnerGame', data.winner)
+
+	$("#name").remove();
+	$("#uid").remove();
+	$("#tokenColor").remove();
+	$("#tokenMoney").remove();
+	$("#tokenPosition").remove();
+	$("#infoGame").remove();	
+	$("#payToGoButton").remove();
+	$("#doubleToGoButton").remove();
+	$("#cardToGoButton").remove();
+	$('#throwDiceButton').remove();
+	$('#throwDiceButton').remove();
+	$("#payToGoButton").remove();
+	$("#doubleToGoButton").remove();
+	$("#cardToGoButton").remove();
+	$("#listGroupsToBuild").remove();
+	$('#buildButton').remove();
+	$('#buyButton').remove();
+	$('#sellButton').remove();
+	$('#mortgageButton').remove();
+	$('#changeTurnButton').remove();
+	$('#boardGraphics').remove();
+	$('#dicesArea').remove();
+
+	$("#dices").append("<p id='dicesArea'> End of The Game </p>")
+	
+}
+
+function throwingDiceTest(position)
+{	
+	uid = $.cookie("uid");
+	$("#payToGoButton").remove();
+	$("#doubleToGoButton").remove();
+	$("#cardToGoButton").remove();
+	$.getJSON(url+"throwingDiceTest/"+uid+"/"+position, function(data){
+		if(data.winner == undefined)
+		{
+			if(data.jail == false)
+			{
+				showPositionToken(data.position)
+				showMoneyToken(data.money)	
+				showInfoGame(data.infoToken);
+				//showInfoGame(data.infoToken);
+				showDicesGame(data.diceOne, data.diceTwo);
+				showBuyButton();
+				showSellingButton();
+				showMortgageButton();
+				showChangeTurnButton();		
+				//loadToken(setToken);
+				reloadPositionGraphs();
+				$.cookie("cardGoOutJail", data.cardGoOutJail);
+				$.cookie("jail", data.jail);
+			}
+			else
+			{
+				showDicesGame(data.diceOne, data.diceTwo);
+				showPositionToken(data.position);
+				alert(data.infoToken)
+				showInfoGame(data.infoToken);
+				//showChangeTurnButton();	
+				reloadPositionGraphs();			
+				$.cookie("cardGoOutJail", data.cardGoOutJail);
+				$.cookie("jail", data.jail);
+				
+				$('#throwDiceButton').remove();
+				
+				if(($.cookie("secondPass")) == false)
+				{
+					$.cookie("secondPass", true);
+					socket.emit('changeMyTurn', $.cookie("uid"))				
+				}
+				else
+				{				
+					showInfoGame("You are in the Jail, you have to decide how to go out")
+					showOptionsToGoOut();
+				}			
+			}
+		}
+		else //if(data.namePhase == "End Game")
+		{
+			showWinner(data);
+			
+		}
+	})
+}
+
+function goOutOfJail(uid, optionChoosen){
+	$.getJSON(url+"goOutJail/"+uid+"/"+optionChoosen, function(data){
+		showMoneyToken(data.money);
+		showDicesGame(data.diceOne, data.diceTwo);
+		showInfoGame(data.infoToken);
+		$.cookie("cardGoOutJail", data.cardGoOutJail);
+		$.cookie("jail", data.jail);
+		if(!data.jail)
+			$.cookie("secondPass", false);
+		//showChangeTurnButton();
+		$("#payToGoButton").remove();
+		$("#doubleToGoButton").remove();
+		$("#cardToGoButton").remove();
+		socket.emit('changeMyTurn', $.cookie("uid"))
 	})
 }
 
@@ -427,25 +768,59 @@ function buy(uid)
 		if(data.buy)
 		{
 			showMoneyToken(data.money);
-			showPropertiesUser(data.propertyBought, data.propertyBoughtType)
+			showPropertiesUser(data);
+			if(data.state == "Group")
+			{
+				
+				//buildWhere($.cookie("uid"))
+				showBuildButton(data.listGroup);	
+			}
+				
 		}
 		showInfoGame(data.infoToken);	
 	})
 }
 
-function buildWhere(uid)
+function sell(uid)
+{	
+	$.getJSON(url+"sell/"+uid, function(data){
+		if(data.sell)
+		{
+			showMoneyToken(data.money);
+			//showPropertiesUser(data);
+		}
+		showInfoGame(data.infoToken);	
+	})
+}
+
+function mortgage(uid)
+{	
+	$.getJSON(url+"mortgage/"+uid, function(data){
+		if(data.mortgage)
+		{
+			showMoneyToken(data.money);
+			//showPropertiesUser(data);
+		}
+		showInfoGame(data.infoToken);	
+	})
+}
+
+/*function buildWhere(uid)
 {
+	alert("Estoy en el BUILD")
 	$.getJSON(url+"buildWhere/"+uid, function(data){
 		if(data.listGroupsColors.length > 0)
 		{
 			showBuildButton(data.listGroupsColors);			
 		}
 	})
-}
+}*/
 
-function build(uid, nameStreet)
+function build(uid, colorGroup)
 {
-	$.getJSON(url+"build/"+uid+nameStreet, function(data){
+	console.log("BUILDING...")
+	$.getJSON(url+"build/"+uid+"/"+colorGroup, function(data){
+		console.log(data)
 		if(data.build)
 		{
 			showMoneyToken(data.money);
@@ -484,4 +859,11 @@ socket.on('changeMyTurn', function (data){
 		showIsMyTurnButton();
 	else
 		alert("Error");
+})
+
+socket.on('showWinnerGame', function (data){
+	if(data.name == $.cookie("name"))
+		alert(data.info)
+	else
+		alert(data.info)
 })

@@ -15,6 +15,7 @@ function Game(dice, numPlayers)
 	this.phase = undefined;
 	this.minNumPlayers = numPlayers;
 	this.winner = undefined;
+	this.loosers = [];
 	this.winners = [];
 	this.dice = dice;
 	this.info = undefined;
@@ -122,7 +123,51 @@ function Game(dice, numPlayers)
 		if(this.diceOne != this.diceTwo){			
 			this.players[this.turnGame].turn = false;
 		}
+		this.checkWinners(token);
+
+		if((this.players.length - this.loosers.length) == 1)
+			this.checkFinalWinners();
+	}
+
+	this.checkWinners = function(token)
+	{
+		if(this.players[this.turnGame].Token.money >= 1700)
+		{
+			this.winner = this.players[this.turnGame].uid;
+			this.info = this.winner;
+			this.phase = new mphases.EndPhase(this);
+			console.log("Fase" + this.phase.name);
+		}
+		//this.turnGame = this.turnGame + 1;
 		
+		/*if(this.players[this.turnGame].Token.money < 0)
+		{					
+			this.turnGame = this.turnGame + 1;
+			this.loosers.push(this.players[this.turnGame]);
+		}*/
+	}
+
+	this.checkFinalWinners = function()
+	{
+		for(i=0; i<this.players.length; i++)
+		{
+			if(this.players[i].Token.money>=0)
+			{
+				this.winner = this.players[i].uid;
+				this.phase = new mphases.EndPhase(this);
+			}				
+		}
+	}
+	this.throwingDiceGoOut = function(token)
+	{
+		this.diceOne = this.dice.throwingDice();
+		this.diceTwo = this.dice.throwingDice();
+		console.log("You get " + this.diceOne + " & " + this.diceTwo);
+		this.info = "You get " + this.diceOne + " & " + this.diceTwo;
+		if(this.diceOne == this.diceTwo)
+			return true
+		else
+			return false
 	}
 
 	this.throwingDiceTest = function(token, position)
@@ -138,9 +183,62 @@ function Game(dice, numPlayers)
 		this.board.moveToken(this, token);
 		//Al añadir esta frase le obligamos a tener que pasar
 		this.players[this.turnGame].turn = false;
+
+		this.checkWinners(token);
+
+		if((this.players.length - this.loosers.length) == 1)
+			this.checkFinalWinners();
+
 	}
 	this.changedTurn = function()
 	{
+		console.log("CAMBIAAAAANDO EL TURNOOO")
+		this.players[this.turnGame].turn = false;
+		
+		/*
+		if(this.players[this.turnGame].Token.money >= 1700)
+		{
+			this.winner = this.players[this.turnGame].name;
+			this.info = this.winner;
+			this.phase = new mphases.EndPhase(this);
+			console.log("Fase" + this.phase.name);
+		}		
+		else
+		{*/
+			this.checkWinners(this.players[this.turnGame].token);
+			/*
+			if((this.players.length - this.loosers.length) == 1)
+				this.checkFinalWinners();*/
+			
+			this.turnGame = this.turnGame + 1;
+						
+			if(this.turnGame > this.players.length-1)
+			{
+				this.turnGame=0;
+				if(this.players[this.turnGame].Token.money < 0)
+				{
+					this.loosers.push(this.players[this.turnGame]);					
+					this.turnGame = this.turnGame + 1;
+					console.log("tamaño " + this.loosers.length);
+
+				}
+				this.players[this.turnGame].turn = true;
+			}
+			else
+			{
+
+				if(this.players[this.turnGame].Token.money < 0)
+				{
+					this.loosers.push(this.players[this.turnGame]);
+					this.turnGame = this.turnGame + 1;
+					console.log("tamaño " + this.loosers.length);
+				}
+				this.players[this.turnGame].turn = true;
+			}			
+		//} 
+
+
+		/*
 		this.players[this.turnGame].turn = false;
 		this.turnGame = this.turnGame + 1;
 		
@@ -150,7 +248,7 @@ function Game(dice, numPlayers)
 			this.players[this.turnGame].turn = true;
 			for(i=0; i<this.players.length; i++)
 			{
-				if(this.players[i].Token.money > 20000)
+				if(this.players[i].Token.money > 1600)
 				{
 					this.winners[this.winners.length] = this.players[i]
 				}
@@ -164,7 +262,11 @@ function Game(dice, numPlayers)
 				for(i=0; i< this.winners.length; i++)
 				{
 					if(this.winners[i].money> this.winner.money)
+					{
 						this.winner = this.winners[i];
+						this.info = this.winner;
+					}	
+
 				}
 				this.phase = new mphases.EndPhase(this);
 			}
@@ -173,7 +275,7 @@ function Game(dice, numPlayers)
 		else
 		{
 			this.players[this.turnGame].turn = true;
-		}
+		}*/
 			
 	}
 	this.startGame = function()
@@ -187,14 +289,27 @@ function Game(dice, numPlayers)
 		return this.board.buy(token);
 	}
 
+	this.mortgage = function(token)
+	{
+		console.log("hipotecando")
+		return this.board.mortgage(token);
+	}
+
+	this.sellBuildings = function(token)
+	{
+		return this.board.sellBuildings(token);
+	}
+	
 	this.build = function(token, colorGroup)
 	{
-		this.board.build(token, colorGroup)
+		return this.board.build(token, colorGroup)
 	}
 
 	this.goOutJail = function(token, optionChoosen)
 	{
-		this.board.goOutJail(this, token, optionChoosen);
+		console.log(optionChoosen + " 2");
+		console.log(this);
+		return this.board.goOutJail(this, token, optionChoosen);
 	}
 	this.getUser = function(uid)
 	{

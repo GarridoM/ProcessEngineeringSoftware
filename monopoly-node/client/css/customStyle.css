@@ -1,0 +1,35 @@
+footer {
+	background-color: #555;
+	border-color: #080808;
+	color: white;
+	padding: 15 px;
+}
+.page-header{
+	padding-bottom:9px;
+	margin:40px 0 20px;
+	border-bottom: 0px solid #eee
+}
+.navbar-inverse{
+	background-color: #555;
+}
+
+.alert{
+
+	border: 5px solid #5cb85c;
+	border-radius: 10px;
+	padding: 10px 10px 10px 36px;
+	margin: 10px;
+	color: #00529B;
+	background-color: #BDE5F8;
+}
+
+.infoGameClass{
+	border: 2px solid #5cb85c;
+	border-radius: 10px;
+	padding: 10px 0px 10px 15px;
+	background-color: #dff0d8;
+}
+
+.leftSideClass{
+	background-color: #111111;
+}

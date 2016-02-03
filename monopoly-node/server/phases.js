@@ -49,14 +49,14 @@ function EndPhase(game)
 	this.addUser = function(token)
 	{
 		console.log("El juego ya ha terminado")
-		token.info = "El juego ya ha terminado";
+		token.info = "The game has ended";
 		return false;
 	}
 
 	this.throwingDice = function(token)
 	{
 		console.log("El juego ya ha terminado")
-		token.info = "El juego ya ha terminado"
+		//token.info = "The game has ended"
 		return false;
 	}
 
@@ -64,7 +64,7 @@ function EndPhase(game)
 	this.isEnded = function ()
 	{
 		console.log("El Ganador es: " + this.game.winner)
-		this.game.info = "El Ganador es: " + this.game.winner;
+		this.game.info = "The winner is: " + this.game.winner;
 	}
 	this.isEnded();
 

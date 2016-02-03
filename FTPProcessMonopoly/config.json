@@ -1,0 +1,9 @@
+{
+<<<<<<< HEAD
+	
+	"host": "processmonopoly.azurewebsites.net"
+=======
+	
+	"host": "127.0.0.1"
+>>>>>>> 827b56e2e55ccfdbc3a064bd643569312b7a3b0a
+}
